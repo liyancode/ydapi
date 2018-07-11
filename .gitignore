@@ -3,3 +3,4 @@ Gemfile.lock
 bak_files/
 log/
 test.rb
+_conf/conf_i.yml
