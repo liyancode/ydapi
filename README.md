@@ -1,7 +1,10 @@
-1) install bundler
+# ydapi
+
+start:
+
+1) install bundler  
 `$gem install bundler`  
-2)
-`$gem install pg`  
+2) `$gem install pg`  
 may meet issue:  
 https://stackoverflow.com/questions/4335750/cant-install-pg-gem-on-windows  
 worked: `$gem install pg -- --with-pg-dir="/Library/PostgreSQL/9.6"`
