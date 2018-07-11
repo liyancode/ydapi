@@ -2,7 +2,7 @@
 require 'yaml'
 require 'logger'
 
-CONF = YAML.load_file(File.dirname(__FILE__) + '/conf.yml')
+CONF = YAML.load_file(File.dirname(__FILE__) + '/conf_i.yml')
 
 SYSTEM_LOGGER = Logger.new(CONF["log_system"], 10, 10240000) # keep 10 old history each 10M size
 SYSTEM_LOGGER.level = Logger::DEBUG
