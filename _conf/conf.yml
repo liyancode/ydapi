@@ -3,19 +3,19 @@
 # JWT_SECRET=someawesomesecret JWT_ISSUER=yderpapi.com rackup
 
 #DB = Sequel.connect('postgres://localhost/blog', user: 'user', password: 'password')
-db_connect_url: 'postgres://localhost:5432/yddb'
+db_connect_url: 'postgres://localhost:5432/dnname'
 db_username: 'postgres'
-db_password: 'root'
+db_password: '****'
 
 # logs
-log_system: '/Users/yanl/RubymineProjects/helloapi/log/system.log'
-log_biz_model: '/Users/yanl/RubymineProjects/helloapi/log/biz_model.log'
-log_biz_service: '/Users/yanl/RubymineProjects/helloapi/log/biz_service.log'
-log_biz_service_w: '/Users/yanl/RubymineProjects/helloapi/log/biz_service_w.log'
+log_system: '~/log/system.log'
+log_biz_model: '~/log/biz_model.log'
+log_biz_service: '~/log/biz_service.log'
+log_biz_service_w: '~/log/biz_service_w.log'
 
 # auth
 auth_jwt_secret: 'ydapi_dummy_jwt_secret'
-auth_jwt_issuer: 'ydapi.yaodichina.cn'
+auth_jwt_issuer: 'aa.bb.cc'
 auth_token_expire: 3600
 # authority scopes, authority=0 to 10
 authority_scope_1: ['users_get','users_update']
