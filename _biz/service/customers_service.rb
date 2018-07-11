@@ -7,7 +7,7 @@ module YDAPI
       @@customers_model = YDAPI::BizModel::CustomersModel
 
       # add one customer
-      # body
+      # body{"customer":
       # {
       #             "id": 1,
       #             "customer_id": "201",
@@ -22,20 +22,36 @@ module YDAPI
       #             "company_description": null,
       #             "comment": null,
       #             "status": 1
-      #         }
+      #         },
+      # "contact":{
+      # }
+      #
+      # }
       post '/customer' do
         process_request(request, 'users_get') do |req, username|
           begin
             body_hash=JSON.parse(req.body.read)
             @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
-            customer=customer_hash_to_customer(body_hash)
+            customer=customer_hash_to_customer(body_hash["customer"])
             customer.added_by_user_name=username
             if customer
               new_customer=@@customers_model.add_new_customer(customer)
               if new_customer
-                status 201
-                content_type :json
-                {customer:new_customer.values}.to_json
+                contact=customer_contact_hash_to_customer_contact(body_hash["contact"])
+                if contact
+                  contact.customer_id=new_customer.customer_id
+                  contact.added_by_user_name=username
+                  new_contact=@@customers_model.add_new_customer_contact(contact)
+                  if new_contact
+                    status 201
+                    content_type :json
+                    {customer:new_customer.values,contact:new_contact.values}.to_json
+                  else
+                    halt 409
+                  end
+                else
+                  halt 400
+                end
               else
                 halt 409
               end
@@ -114,8 +130,15 @@ module YDAPI
       get '/customer/:customer_id' do
         process_request(request, 'users_get') do |req, username|
           begin
-            p params[:customer_id]
-            @@customers_model
+            customer_and_contacts=@@customers_model.get_customer_and_contacts_by_customer_id(params[:customer_id])
+            if customer_and_contacts
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              customer_and_contacts.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
           rescue Exception => e
             @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
             halt 500
@@ -246,9 +269,37 @@ module YDAPI
         end
       end
 
+      # {
+      #     "id": 3,
+      #     "customer_id": "203",
+      #     "added_by_user_name": "tu02",
+      #     "fullname": "tufn02",
+      #     "gender": 1,
+      #     "title": null,
+      #     "email": null,
+      #     "phone_number": null,
+      #     "other_contact_info": null,
+      #     "comment": null,
+      #     "created_at": "2018-07-08 22:53:53 +0800",
+      #     "last_update_at": "2018-07-08 22:53:53 +0800",
+      #     "status": 1
+      # },
       def customer_contact_hash_to_customer_contact(customer_contact_hash)
         begin
           if customer_contact_hash && customer_contact_hash.class == Hash && customer_contact_hash.keys.size > 0
+            customer_contact=YDAPI::BizEntity::CustomerContact.new
+            customer_contact.id=customer_contact_hash["id"]
+            customer_contact.customer_id=customer_contact_hash["customer_id"]
+            customer_contact.added_by_user_name=customer_contact_hash["added_by_user_name"]
+            customer_contact.fullname=customer_contact_hash["fullname"]
+            customer_contact.gender=customer_contact_hash["gender"]
+            customer_contact.title=customer_contact_hash["title"]
+            customer_contact.email=customer_contact_hash["email"]
+            customer_contact.phone_number=customer_contact_hash["phone_number"]
+            customer_contact.other_contact_info=customer_contact_hash["other_contact_info"]
+            customer_contact.comment=customer_contact_hash["comment"]
+            customer_contact.status=customer_contact_hash["status"]
+            customer_contact
           else
             nil
           end
