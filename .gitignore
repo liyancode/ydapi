@@ -1,0 +1,5 @@
+.idea
+Gemfile.lock
+bak_files/
+log/
+test.rb

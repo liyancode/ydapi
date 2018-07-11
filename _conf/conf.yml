@@ -1,0 +1,22 @@
+# config yml file
+# server start
+# JWT_SECRET=someawesomesecret JWT_ISSUER=yderpapi.com rackup
+
+#DB = Sequel.connect('postgres://localhost/blog', user: 'user', password: 'password')
+db_connect_url: 'postgres://localhost:5432/yddb'
+db_username: 'postgres'
+db_password: 'root'
+
+# logs
+log_system: '/Users/yanl/RubymineProjects/helloapi/log/system.log'
+log_biz_model: '/Users/yanl/RubymineProjects/helloapi/log/biz_model.log'
+log_biz_service: '/Users/yanl/RubymineProjects/helloapi/log/biz_service.log'
+log_biz_service_w: '/Users/yanl/RubymineProjects/helloapi/log/biz_service_w.log'
+
+# auth
+auth_jwt_secret: 'ydapi_dummy_jwt_secret'
+auth_jwt_issuer: 'ydapi.yaodichina.cn'
+auth_token_expire: 3600
+# authority scopes, authority=0 to 10
+authority_scope_1: ['users_get','users_update']
+authority_scope_2: ['users_get','users_update','users_add','users_delete']
