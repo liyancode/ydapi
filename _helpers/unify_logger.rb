@@ -27,9 +27,9 @@ module YDAPI
       def _service_log(level,log_id,class_name,request,username,status_code,exception=nil)
         begin
           if level=='info'
-            @logger.info("[#{log_id}] #{class_name}.process_request #{request.env["REQUEST_METHOD"]} #{request.fullpath} username=#{username} #{http_status_msg(status_code)}.")
+            @logger.info("[#{log_id}] #{class_name} #{request.env["REQUEST_METHOD"]} #{request.fullpath} username=#{username} #{http_status_msg(status_code)}.")
           elsif level=='error'
-            @logger.error("[#{log_id}] #{class_name}.process_request #{request.env["REQUEST_METHOD"]} #{request.fullpath} username=#{username} #{http_status_msg(status_code)}. Exception:#{exception}")
+            @logger.error("[#{log_id}] #{class_name} #{request.env["REQUEST_METHOD"]} #{request.fullpath} username=#{username} #{http_status_msg(status_code)}. Exception:#{exception}")
           else
           #   nothing
           end
