@@ -4,7 +4,11 @@ module YDAPI
       use YDAPI::Helpers::JwtAuth
       @@logger = BIZ_SERVICE_LOGGER
 
+      @@unify_logger=YDAPI::Helpers::UnifyLogger.new(BIZ_SERVICE_LOGGER)
+
       @@customers_model = YDAPI::BizModel::CustomersModel
+
+
 
       # add one customer
       # body{"customer":
@@ -130,6 +134,7 @@ module YDAPI
       get '/customer/:customer_id' do
         process_request(request, 'users_get') do |req, username|
           begin
+            @@unify_logger._service_log('info','logid_01',self,req,username,200)
             customer_and_contacts=@@customers_model.get_customer_and_contacts_by_customer_id(params[:customer_id])
             if customer_and_contacts
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
