@@ -207,10 +207,22 @@ module YDAPI
       put '/customer_contact' do
         process_request(request, 'users_get') do |req, username|
           begin
-            p req.body
-            'ok'
-            content_type :json
-            {money: @accounts[username]}.to_json
+            body_hash=JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            customer_contact=customer_contact_hash_to_customer_contact(body_hash)
+            customer_contact.added_by_user_name=username
+            if customer_contact
+              new_customer_contact=@@customers_model.update_customer_contact(customer_contact)
+              if new_customer_contact
+                status 201
+                content_type :json
+                {customer_contact:new_customer_contact.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
           rescue Exception => e
             @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
             halt 500
