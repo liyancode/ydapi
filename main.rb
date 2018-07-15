@@ -6,6 +6,7 @@ require 'require_all'
 
 require './_conf/conf.rb'
 require './_helpers/helper.rb'
+require './_helpers/unify_logger.rb'
 require './_helpers/request_processor.rb'
 require './_helpers/jwt_auth.rb'
 
