@@ -43,6 +43,19 @@ module YDAPI
         end
       end
 
+      def Helper.new_step1_id(base_id)
+        begin
+          @@logger.info("#{self}.new_step1_id(#{base_id})")
+          if base_id.to_i > 0
+            return "#{base_id.to_i + 1}"
+          end
+          nil
+        rescue Exception => e
+          @@logger.error("#{self}.new_step1_id(#{base_id}) Exception:#{e}")
+          nil
+        end
+      end
+
       def Helper.get_scopes_by_user_authority(authority)
         begin
           if authority > 0
