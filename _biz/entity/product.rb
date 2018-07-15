@@ -8,7 +8,7 @@ module YDAPI
       attr_accessor :product_type_id
       attr_accessor :measurement_unit
       attr_accessor :specification
-      attr_accessor :raw_material_ids
+      attr_accessor :raw_material_ids # 1,2,3 by ,
       attr_accessor :features
       attr_accessor :use_for
       attr_accessor :description
