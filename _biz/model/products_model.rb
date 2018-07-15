@@ -82,6 +82,34 @@ module YDAPI
           nil
         end
       end
+
+      def ProductsModel.get_products_by_product_type_id(product_type_id)
+        @@logger.info("#{self}.get_products_by_product_type_id(#{product_type_id})")
+        products = @@products.func_get_all_by_product_type_id(product_type_id)
+        if products
+          products_array = []
+          products.each{|row|
+            products_array<<row.values
+          }
+          {:products => products_array}
+        else
+          nil
+        end
+      end
+
+      def ProductsModel.get_all_products
+        @@logger.info("#{self}.get_all_products")
+        products = @@products.func_get_all
+        if products
+          products_array = []
+          products.each{|row|
+            products_array<<row.values
+          }
+          {:products => products_array}
+        else
+          nil
+        end
+      end
     end
   end
 end
