@@ -30,6 +30,19 @@ module YDAPI
         end
       end
 
+      def Helper.new_product_id(base_product_id)
+        begin
+          @@logger.info("#{self}.new_product_id(#{base_product_id})")
+          if base_product_id.to_i > 0
+            return "#{base_product_id.to_i + 1}"
+          end
+          nil
+        rescue Exception => e
+          @@logger.error("#{self}.new_product_id(#{base_product_id}) Exception:#{e}")
+          nil
+        end
+      end
+
       def Helper.get_scopes_by_user_authority(authority)
         begin
           if authority > 0
