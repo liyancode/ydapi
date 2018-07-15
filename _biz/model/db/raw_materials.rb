@@ -65,6 +65,15 @@ module YDAPI
           end
         end
 
+        def RawMaterials.func_get_by_id_arr(raw_material_id_arr)
+          begin
+            RawMaterials.dataset.where([[:raw_material_id,raw_material_id_arr]]).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_by_id_arr(rdaw_material_id_arr) Exception:#{e}")
+            nil
+          end
+        end
+
         def RawMaterials.func_get_max_raw_material_id
           begin
             RawMaterials.last.raw_material_id
