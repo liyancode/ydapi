@@ -6,6 +6,23 @@ module YDAPI
 
       @@products_model = YDAPI::BizModel::ProductsModel
 
+      # {
+      #     "id": 2,
+      #     "product_id": "20002",
+      #     "added_by_user_name": "testname05",
+      #     "name": "暖通T型(YD-T-S1)",
+      #     "product_type_id": "7002",
+      #     "measurement_unit": "米",
+      #     "specification": "YD-T-S1",
+      #     "raw_material_ids": "3,4",
+      #     "features": null,
+      #     "use_for": "用于普通舒适空调的送风",
+      #     "description": null,
+      #     "comment": null,
+      #     "created_at": "2018-07-15 17:38:27 +0800",
+      #     "last_update_at": "2018-07-15 17:38:27 +0800",
+      #     "status": 1
+      # }
       post '/product' do
         process_request(request, 'users_get') do |req, username|
           begin
@@ -117,7 +134,7 @@ module YDAPI
       get '/' do
         process_request(request, 'users_get') do |req, username|
           begin
-            products=@@products_model.get_products_by_product_type_id(params[:product_type_id])
+            products=@@products_model.get_all_products
             if products
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
@@ -133,6 +150,42 @@ module YDAPI
         end
       end
 
+      get '/product_types/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            product_types=@@products_model.get_all_product_types
+            if product_types
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              product_types.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      # {
+      #     "id": 2,
+      #     "product_id": "20002",
+      #     "added_by_user_name": "testname05",
+      #     "name": "暖通T型(YD-T-S1)",
+      #     "product_type_id": "7002",
+      #     "measurement_unit": "米",
+      #     "specification": "YD-T-S1",
+      #     "raw_material_ids": "3,4",
+      #     "features": null,
+      #     "use_for": "用于普通舒适空调的送风",
+      #     "description": null,
+      #     "comment": null,
+      #     "created_at": "2018-07-15 17:38:27 +0800",
+      #     "last_update_at": "2018-07-15 17:38:27 +0800",
+      #     "status": 1
+      # }
       def product_hash_to_product(product_hash)
         begin
           if product_hash && product_hash.class == Hash && product_hash.keys.size > 0
