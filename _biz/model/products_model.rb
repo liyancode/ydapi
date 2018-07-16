@@ -110,6 +110,20 @@ module YDAPI
           nil
         end
       end
+
+      def ProductsModel.get_all_product_types
+        @@logger.info("#{self}.get_all_product_types")
+        product_types = @@products_type.func_get_all
+        if product_types
+          product_types_array = []
+          product_types.each{|row|
+            product_types_array<<row.values
+          }
+          {:product_types => product_types_array}
+        else
+          nil
+        end
+      end
     end
   end
 end
