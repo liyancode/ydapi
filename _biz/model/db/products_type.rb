@@ -59,7 +59,7 @@ module YDAPI
           begin
             ProductsType.dataset.where(status:1).all
           rescue Exception => e
-            @@logger.error("#{self}.func_get(raw_material_id) Exception:#{e}")
+            @@logger.error("#{self}.func_get_all Exception:#{e}")
             nil
           end
         end
