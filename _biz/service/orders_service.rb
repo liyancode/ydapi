@@ -28,26 +28,58 @@ module YDAPI
             ask_price=ask_price_hash_to_ask_price(body_hash)
             ask_price.added_by_user_name=username
             if ask_price
-              # new_customer=@@customers_model.add_new_customer(customer)
-              # if new_customer
-              #   contact=customer_contact_hash_to_customer_contact(body_hash["contact"])
-              #   if contact
-              #     contact.customer_id=new_customer.customer_id
-              #     contact.added_by_user_name=username
-              #     new_contact=@@customers_model.add_new_customer_contact(contact)
-              #     if new_contact
-              #       status 201
-              #       content_type :json
-              #       {customer:new_customer.values,contact:new_contact.values}.to_json
-              #     else
-              #       halt 409
-              #     end
-              #   else
-              #     halt 400
-              #   end
-              # else
-              #   halt 409
-              # end
+              new_ask_price = @@orders_model.add_new_ask_price(ask_price)
+              if new_ask_price
+                status 201
+                content_type :json
+                {ask_price: new_ask_price.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      delete '/ask_prices/ask_price/:ask_price_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            ask_price=@@orders_model.delete_ask_price_by_ask_price_id(params[:ask_price_id])
+            if ask_price
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              status 200
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/ask_prices/ask_price' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            ask_price = ask_price_hash_to_ask_price(body_hash)
+            ask_price.added_by_user_name = username
+            if ask_price
+              new_ask_price = @@orders_model.update_ask_price(ask_price)
+              if new_ask_price
+                status 201
+                content_type :json
+                {ask_price: new_ask_price.values}.to_json
+              else
+                halt 409
+              end
             else
               halt 400
             end
@@ -96,6 +128,152 @@ module YDAPI
         end
       end
 
+      # ---- contract
+      # {
+      #             "id": 1,
+      #             "contract_id": "880001",
+      #             "added_by_user_name": "testname105",
+      #             "sign_by_user_name": "testname105",
+      #             "customer_id": "215",
+      #             "sign_at": "2018-07-01",
+      #             "start_date": "2018-07-10",
+      #             "end_date": "2019-05-01",
+      #             "total_value": "1500000",
+      #             "description": "这是一个测试合同",
+      #             "contract_status": 1,
+      #             "comment": "测试",
+      #             "created_at": "2018-07-23 22:54:33 +0800",
+      #             "last_update_at": "2018-07-23 22:54:33 +0800",
+      #             "status": 1
+      #         }
+      post '/contracts/contract' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash=JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            contract=contract_hash_to_contract(body_hash)
+            contract.added_by_user_name=username
+            if contract
+              new_contract = @@orders_model.add_new_contract(contract)
+              if new_contract
+                status 201
+                content_type :json
+                {contract: new_contract.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      delete '/contracts/contract/:contract_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            contract=@@orders_model.delete_contract_by_contract_id(params[:contract_id])
+            if contract
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              status 200
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/contracts/contract' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            contract = contract_hash_to_contract(body_hash)
+            contract.added_by_user_name = username
+            if contract
+              new_contract = @@orders_model.update_contract(contract)
+              if new_contract
+                status 201
+                content_type :json
+                {contract: new_contract.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/contracts/contract/:contract_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_contract_by_contract_id(params[:contract_id])
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              {:contract=>result.values}.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/contracts/by_user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_contracts_by_user_name(username)
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/contracts/by_sign_user/:sign_user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_contracts_by_sign_user_name(params[:sign_user_name])
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+
       # {
       #     "id": 1,
       #     "ask_price_id": "470001",
@@ -125,6 +303,32 @@ module YDAPI
             ask_price.comment=ask_price_hash["comment"]
             ask_price.status=ask_price_hash["status"]
             ask_price
+          else
+            nil
+          end
+        rescue Exception => e
+          nil
+        end
+      end
+
+      def contract_hash_to_contract(contract_hash)
+        begin
+          if contract_hash && contract_hash.class == Hash && contract_hash.keys.size > 0
+            contract=YDAPI::BizEntity::Contract.new
+            contract.id=contract_hash["id"]
+            contract.contract_id=contract_hash["contract_id"]
+            contract.added_by_user_name=contract_hash["added_by_user_name"]
+            contract.sign_by_user_name=contract_hash["sign_by_user_name"]
+            contract.customer_id=contract_hash["customer_id"]
+            contract.sign_at=contract_hash["sign_at"]
+            contract.start_date=contract_hash["start_date"]
+            contract.end_date=contract_hash["end_date"]
+            contract.total_value=contract_hash["total_value"]
+            contract.description=contract_hash["description"]
+            contract.contract_status=contract_hash["contract_status"]
+            contract.comment=contract_hash["comment"]
+            contract.status=contract_hash["status"]
+            contract
           else
             nil
           end
