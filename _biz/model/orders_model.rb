@@ -10,6 +10,9 @@ module YDAPI
       @@contract=YDAPI::BizEntity::Contract
       @@contracts=YDAPI::BizModel::DBModel::Contracts
 
+      @@order=YDAPI::BizEntity::Order
+      @@orders=YDAPI::BizModel::DBModel::Orders
+
       # ---- ask_prices ----↓
       def OrdersModel.add_new_ask_price(ask_price)
         if ask_price.is_a?(@@ask_price)
@@ -113,6 +116,67 @@ module YDAPI
             contracts_array<<row.values
           }
           {:contracts => contracts_array}
+        else
+          nil
+        end
+      end
+
+      # ---- orders ----↓
+      def OrdersModel.add_new_order(order)
+        if order.is_a?(@@order)
+          new_id = @@helper.new_step1_id(@@orders.func_get_max_order_id)
+          if new_id != nil
+            order.order_id = new_id
+            @@logger.info("#{self}.add_new_order, order=#{order}")
+            @@orders.func_add(order)
+          else
+            @@logger.error("#{self}.add_new_order, order_id error")
+            nil
+          end
+        else
+          @@logger.error("#{self}.add_new_order, order is not a #{@@order}")
+          nil
+        end
+      end
+
+      def OrdersModel.delete_order_by_order_id(order_id)
+        @@logger.info("#{self}.delete_order_by_order_id(#{order_id})")
+        @@orders.func_delete(order_id)
+      end
+
+      def OrdersModel.update_order(order)
+        @@logger.info("#{self}.update_order, order=#{order}")
+        @@orders.func_update(order)
+      end
+
+      def OrdersModel.get_order_by_order_id(order_id)
+        @@logger.info("#{self}.get_order_by_order_id(#{order_id})")
+        @@orders.func_get(order_id)
+      end
+
+      def OrdersModel.get_orders_by_user_name(user_name)
+        @@logger.info("#{self}.get_orders_by_user_name(#{user_name})")
+        orders = @@orders.func_get_all_by_user_name(user_name)
+        if orders
+          orders_array = []
+          orders.each{|row|
+            orders_array<<row.values
+          }
+          {:orders => orders_array}
+        else
+          nil
+        end
+      end
+
+      def OrdersModel.get_orders_by_sign_user_name(sign_by_user_name)
+        @@logger.info("#{self}.get_orders_by_sign_user_name(#{sign_by_user_name})")
+        orders = @@orders.func_get_all_by_sign_user(sign_by_user_name)
+        if orders
+          orders_array = []
+          orders.each{|row|
+            orders_array<<row.values
+          }
+          {:orders => orders_array}
         else
           nil
         end
