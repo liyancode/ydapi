@@ -273,6 +273,155 @@ module YDAPI
         end
       end
 
+      # ---- orders ----
+      # {
+      #             "id": 1,
+      #             "order_id": "660001",
+      #             "added_by_user_name": "testname105",
+      #             "contract_id": "880001",
+      #             "sign_by_user_name": "testname105",
+      #             "customer_id": "215",
+      #             "start_date": "2018-08-01",
+      #             "end_date": "2019-09-01",
+      #             "total_value": "1890000",
+      #             "pay_type": "fenqi",
+      #             "paid_value": "500000",
+      #             "order_status": "start",
+      #             "order_status_update_by": "admin",
+      #             "is_finished": 0,
+      #             "description": "测试订单",
+      #             "comment": null,
+      #             "created_at": "2018-07-24 21:50:36 +0800",
+      #             "last_update_at": "2018-07-24 21:50:36 +0800",
+      #             "status": 1
+      #         }
+      post '/order' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash=JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            order=order_hash_to_order(body_hash)
+            order.added_by_user_name=username
+            order.order_status_update_by=username
+            if order
+              new_order = @@orders_model.add_new_order(order)
+              if new_order
+                status 201
+                content_type :json
+                {order: new_order.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      delete '/order/:order_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            order=@@orders_model.delete_order_by_order_id(params[:order_id])
+            if order
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              status 200
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/order' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            order = order_hash_to_order(body_hash)
+            order.order_status_update_by = username
+            if order
+              new_order = @@orders_model.update_order(order)
+              if new_order
+                status 201
+                content_type :json
+                {order: new_order.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/order/:order_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_order_by_order_id(params[:order_id])
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              {:order=>result.values}.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/by_user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_orders_by_user_name(username)
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/by_sign_user/:sign_user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_orders_by_sign_user_name(params[:sign_user_name])
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
 
       # {
       #     "id": 1,
@@ -329,6 +478,36 @@ module YDAPI
             contract.comment=contract_hash["comment"]
             contract.status=contract_hash["status"]
             contract
+          else
+            nil
+          end
+        rescue Exception => e
+          nil
+        end
+      end
+
+      def order_hash_to_order(order_hash)
+        begin
+          if order_hash && order_hash.class == Hash && order_hash.keys.size > 0
+            order=YDAPI::BizEntity::Order.new
+            order.id=order_hash["id"]
+            order.order_id=order_hash["order_id"]
+            order.added_by_user_name=order_hash["added_by_user_name"]
+            order.contract_id=order_hash["contract_id"]
+            order.sign_by_user_name=order_hash["sign_by_user_name"]
+            order.customer_id=order_hash["customer_id"]
+            order.start_date=order_hash["start_date"]
+            order.end_date=order_hash["end_date"]
+            order.total_value=order_hash["total_value"]
+            order.pay_type=order_hash["pay_type"]
+            order.paid_value=order_hash["paid_value"]
+            order.order_status=order_hash["order_status"]
+            order.order_status_update_by=order_hash["order_status_update_by"]
+            order.description=order_hash["description"]
+            order.is_finished=order_hash["is_finished"]
+            order.comment=order_hash["comment"]
+            order.status=order_hash["status"]
+            order
           else
             nil
           end
