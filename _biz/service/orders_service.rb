@@ -5,6 +5,7 @@ module YDAPI
       @@logger = BIZ_SERVICE_LOGGER
 
       @@orders_model=YDAPI::BizModel::OrdersModel
+      @@customers_model = YDAPI::BizModel::CustomersModel
 
       # {
       #     "id": 1,
@@ -371,9 +372,14 @@ module YDAPI
           begin
             result=@@orders_model.get_order_by_order_id(params[:order_id])
             if result
+              customer_and_contacts=@@customers_model.get_customer_and_contacts_by_customer_id(result[:customer_id])
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
-              {:order=>result.values}.to_json
+              {
+                :order=>result.values,
+                :customer=>customer_and_contacts[:customer],
+                :customer_contacts=>customer_and_contacts[:contacts]
+              }.to_json
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -390,9 +396,10 @@ module YDAPI
           begin
             result=@@orders_model.get_orders_by_user_name(username)
             if result
+              customers=@@customers_model.get_customers_by_id_arr(result[:customer_id_arr])
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
-              result.to_json
+              {:orders =>result[:orders],:customers=>customers}.to_json
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -409,9 +416,10 @@ module YDAPI
           begin
             result=@@orders_model.get_orders_by_sign_user_name(params[:sign_user_name])
             if result
+              customers=@@customers_model.get_customers_by_id_arr(result[:customer_id_arr])
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
-              result.to_json
+              {:orders =>result[:orders],:customers=>customers}.to_json
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -421,6 +429,24 @@ module YDAPI
             halt 500
           end
         end
+      end
+
+      # ======
+      # test upload file
+      post '/upload_file'do
+        to_dest_folder="/Users/yanl/Desktop/yd/code/yaodi_erp/src/img/test_d"
+        tempfile = params['file'][:tempfile]
+        filename = params['file'][:filename]
+        begin
+          File.open("#{to_dest_folder}/#{filename}", 'wb') do |f|
+            f.write(tempfile.read)
+          end
+          status 201
+        rescue Exception => e
+          @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+          halt 500
+        end 
+        
       end
 
       # {
@@ -497,6 +523,7 @@ module YDAPI
             order.sign_by_user_name=order_hash["sign_by_user_name"]
             order.customer_id=order_hash["customer_id"]
             order.start_date=order_hash["start_date"]
+            order.order_type=order_hash["order_type"]
             order.end_date=order_hash["end_date"]
             order.total_value=order_hash["total_value"]
             order.pay_type=order_hash["pay_type"]
