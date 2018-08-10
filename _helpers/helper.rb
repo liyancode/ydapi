@@ -68,6 +68,22 @@ module YDAPI
           nil
         end
       end
+
+      # user_authority: 'hr:r,order:rw'
+      def Helper.get_authority_hash(default_hash,user_authority)
+        begin
+          if user_authority.size>0
+            auth_arr=user_authority.split(',')
+            # to do
+            
+          else
+            default_hash
+          end
+        rescue Exception => e
+          @@logger.error("#{self}.get_authority_hash(#{user_authority}) Exception:#{e}")
+          nil
+        end
+      end
     end
   end
 end
