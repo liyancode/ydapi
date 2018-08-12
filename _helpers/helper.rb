@@ -74,11 +74,12 @@ module YDAPI
         begin
           if user_authority.size>0
             auth_arr=user_authority.split(',')
-            # to do
-            
-          else
-            default_hash
+            for at in auth_arr
+              kv=at.split(':')
+              default_hash[kv[0]]=kv[1]
+            end
           end
+          default_hash
         rescue Exception => e
           @@logger.error("#{self}.get_authority_hash(#{user_authority}) Exception:#{e}")
           nil
