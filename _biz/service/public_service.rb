@@ -15,7 +15,10 @@ module YDAPI
             if user.password == password
               @@logger.info("#{self} POST /login username=#{username} 200 OK.")
               content_type :json
-              {token: token(username, user.authority)}.to_json
+              {
+                token: token(username, user.authority),
+                authorityHash:@@helper.get_authority_hash(@@config['authority_hash_default'],user.authority)
+              }.to_json
             else
               @@logger.info("#{self} POST /login username=#{username} 401 Unauthorized.")
               halt 401
@@ -39,7 +42,8 @@ module YDAPI
             exp: Time.now.to_i + @@config["auth_token_expire"].to_i,
             iat: Time.now.to_i,
             iss: @@config['auth_jwt_issuer'],
-            scopes: @@helper.get_scopes_by_user_authority(authority),
+            # scopes: @@helper.get_scopes_by_user_authority(authority),
+            scopes: ['users_get','users_update','users_add','users_delete'],
             user: {
                 username: username,
                 authority: authority

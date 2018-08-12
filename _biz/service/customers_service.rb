@@ -159,7 +159,7 @@ module YDAPI
             customers = @@customers_model.get_customers_by_user_name(username)
             if customers
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
-              sleep(1)
+              # sleep(1)
               content_type :json
               customers.to_json
             else
