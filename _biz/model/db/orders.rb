@@ -11,6 +11,7 @@ module YDAPI
               c.contract_id=order.contract_id
               c.sign_by_user_name=order.sign_by_user_name
               c.customer_id=order.customer_id
+              c.order_type=order.order_type
               c.start_date=order.start_date
               c.end_date=order.end_date
               c.total_value=order.total_value
@@ -44,6 +45,7 @@ module YDAPI
                 contract_id:order.contract_id,
                 sign_by_user_name:order.sign_by_user_name,
                 customer_id:order.customer_id,
+                order_type:order.order_type,
                 start_date:order.start_date,
                 end_date:order.end_date,
                 total_value:order.total_value,

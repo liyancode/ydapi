@@ -159,10 +159,14 @@ module YDAPI
         orders = @@orders.func_get_all_by_user_name(user_name)
         if orders
           orders_array = []
+          customer_id_arr=[]
           orders.each{|row|
+            if !customer_id_arr.include?(row[:customer_id])
+              customer_id_arr<<row[:customer_id]
+            end
             orders_array<<row.values
           }
-          {:orders => orders_array}
+          {:orders => orders_array,:customer_id_arr=>customer_id_arr}
         else
           nil
         end
@@ -173,10 +177,14 @@ module YDAPI
         orders = @@orders.func_get_all_by_sign_user(sign_by_user_name)
         if orders
           orders_array = []
+          customer_id_arr=[]
           orders.each{|row|
+            if !customer_id_arr.include?(row[:customer_id])
+              customer_id_arr<<row[:customer_id]
+            end
             orders_array<<row.values
           }
-          {:orders => orders_array}
+          {:orders => orders_array,:customer_id_arr=>customer_id_arr}
         else
           nil
         end

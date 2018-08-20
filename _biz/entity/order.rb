@@ -7,6 +7,7 @@ module YDAPI
       attr_accessor :contract_id
       attr_accessor :sign_by_user_name
       attr_accessor :customer_id
+      attr_accessor :order_type
       attr_accessor :start_date
       attr_accessor :end_date
       attr_accessor :total_value

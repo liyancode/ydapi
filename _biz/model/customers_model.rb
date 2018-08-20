@@ -87,6 +87,20 @@ module YDAPI
           nil
         end
       end
+
+      def CustomersModel.get_customers_by_id_arr(customer_id_arr)
+        @@logger.info("#{self}.get_customers_by_id_arr(#{customer_id_arr})")
+        customers = @@customers.func_get_by_id_arr(customer_id_arr)
+        result={}
+        if customers
+          customers.each {|row|
+            result[row[:customer_id]]=row.values
+          }
+          result
+        else
+          nil
+        end
+      end
     end
   end
 end
