@@ -276,6 +276,7 @@ module YDAPI
           username = user['username']
 
           if scopes.include?(scope)
+            p 'scopes.include==true'
             yield req, username
           else
             @@logger.info("#{self}.process_request #{req.env["REQUEST_METHOD"]} #{req.fullpath} username=#{username} 403 Forbidden.")
