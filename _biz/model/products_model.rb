@@ -70,7 +70,9 @@ module YDAPI
         @@logger.info("#{self}.get_product_by_product_id(#{product_id})")
         product = @@products.func_get(product_id)
         if product
-          raw_materials = @@raw_materials.func_get_by_id_arr(product.raw_material_ids.split(','))
+          tmp_id_arr=[]
+          product.raw_material_ids.size>0?tmp_id_arr=product.raw_material_ids.split(','):tmp_id_arr=[]
+          raw_materials = @@raw_materials.func_get_by_id_arr(tmp_id_arr)
           raw_materials_array = []
           if raw_materials
             raw_materials.each {|row|
