@@ -169,6 +169,31 @@ module YDAPI
         end
       end
 
+      # ======
+      # test upload file
+      post '/product/upload_img/:product_id'do
+        to_dest_folder="#{CONFIG['img_dir_product_detail']}/#{params[:product_id]}"
+        tempfile = params['file'][:tempfile]
+        filename = params['file'][:filename]
+
+        begin
+          type=filename.split('.')[-1]
+
+          unless File.directory?(to_dest_folder)
+            FileUtils.mkdir_p(to_dest_folder)
+          end
+          
+          File.open("#{to_dest_folder}/#{params[:product_id]}.#{type}", 'wb') do |f|
+            f.write(tempfile.read)
+          end
+          status 201
+        rescue Exception => e
+          @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+          halt 500
+        end 
+        
+      end
+
       # {
       #     "id": 2,
       #     "product_id": "20002",
