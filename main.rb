@@ -3,6 +3,7 @@ require 'jwt'
 require 'sinatra/base'
 require 'sequel'
 require 'require_all'
+require 'fileutils'
 
 require './_conf/conf.rb'
 require './_helpers/helper.rb'
