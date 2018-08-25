@@ -175,7 +175,7 @@ module YDAPI
         
         process_request(request, 'users_get') do |req, username|
           begin
-            to_dest_folder="#{CONF['img_dir_product_detail']}/#{params[:product_id]}"
+            to_dest_folder="#{CONF['img_dir_product_detail']}/products_img/#{params[:product_id]}"
             tempfile = params['file'][:tempfile]
             filename = params['file'][:filename]
             type=filename.split('.')[-1]
