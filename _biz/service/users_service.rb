@@ -37,13 +37,24 @@ module YDAPI
             body_hash=JSON.parse(req.body.read)
             @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
             user=user_hash_to_user(body_hash["user"])
+            user_employee_info=employeeinfo_hash_to_employee_info(body_hash["user_employee_info"])
             if user
               new_user=@@user_model.add_new_user(user)
               if new_user
                 new_user.password='***'
-                status 201
-                content_type :json
-                {user:new_user.values}.to_json
+                if user_employee_info
+                  user_employee_info.user_id=new_user.user_id
+                  new_user_employee_info=@@user_model.add_new_user_employee_info(user_employee_info)
+                  if new_user_employee_info
+                    status 201
+                    content_type :json
+                    {user:new_user.values,user_employee_info:new_user_employee_info.values}.to_json
+                  else
+                    halt 409
+                  end
+                else
+                  halt 409
+                end
               else
                 halt 409
               end
@@ -63,12 +74,26 @@ module YDAPI
             body_hash=JSON.parse(req.body.read)
             @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
             user=user_hash_to_user(body_hash["user"])
+            user_employee_info=employeeinfo_hash_to_employee_info(body_hash["user_employee_info"])
             if user
+              if user.password=='***'
+                user.password=@@user_model.get_user_by_user_name(user.user_name)[:password]
+              end
               new_user=@@user_model.update_user(user)
               if new_user
                 new_user.password='***'
-                content_type :json
-                {user:new_user.values}.to_json
+                if user_employee_info
+                  new_user_employee_info=@@user_model.update_user_employee_info(user_employee_info)
+                  if new_user_employee_info
+                    status 201
+                    content_type :json
+                    {user:new_user.values,employee_info:new_user_employee_info.values}.to_json
+                  else
+                    halt 409
+                  end
+                else
+                  halt 400
+                end
               else
                 halt 409
               end
@@ -173,6 +198,25 @@ module YDAPI
         end
       end
 
+      get '/all_users/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            users = @@user_model.get_all_users
+            if users
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              users.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception=>e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       # get one user by username
       delete '/:user_id' do
         process_request(request, 'users_delete') do |req, username|
@@ -180,7 +224,7 @@ module YDAPI
             user = @@user_model.delete_user_by_user_id(params[:user_id])
             if user
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
-              status 200
+              status 201
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
