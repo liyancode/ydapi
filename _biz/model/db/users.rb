@@ -56,6 +56,15 @@ module YDAPI
           end
         end
 
+        def Users.func_get_all
+          begin
+            Users.dataset.where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all Exception:#{e}")
+            nil
+          end
+        end
+
         def Users.func_get_max_user_id
           begin
             Users.last.user_id

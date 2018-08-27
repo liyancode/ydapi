@@ -74,6 +74,15 @@ module YDAPI
             nil
           end
         end
+
+        def UsersEmployeeInfo.func_get_all
+          begin
+            UsersEmployeeInfo.dataset.where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all Exception:#{e}")
+            nil
+          end
+        end
       end
     end
   end
