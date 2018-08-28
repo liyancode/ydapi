@@ -107,6 +107,11 @@ module YDAPI
         end
       end
 
+      def OrdersModel.get_contract_by_id(id)
+        @@logger.info("#{self}.get_contract_by_id(#{id})")
+        @@contracts.func_get_by_id(id)
+      end
+
       def OrdersModel.get_contracts_by_sign_user_name(sign_by_user_name)
         @@logger.info("#{self}.get_contracts_by_sign_user_name(#{sign_by_user_name})")
         contracts = @@contracts.func_get_all_by_sign_user(sign_by_user_name)
