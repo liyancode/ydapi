@@ -107,6 +107,39 @@ module YDAPI
         end
       end
 
+      put '/password' do
+        process_request(request, 'users_update') do |req, username|
+          begin
+            body_hash=JSON.parse(req.body.read)
+            @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} user_name=#{body_hash['user_name']}")
+            user_name=body_hash["user_name"]
+            old_password=body_hash["old_password"]
+            new_password=body_hash["new_password"]
+
+            user=@@user_model.get_user_by_user_name(user_name)
+            if user
+              if user[:password]==old_password
+                new_user=@@user_model.update_user_password(user_name,new_password)
+                if new_user
+                  status 201
+                else
+                  halt 409
+                end
+              else
+                halt 400
+              end
+            else
+              halt 404
+            end
+          rescue Exception=>e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+
+
       # Post add user_employee_info
       # {
       #     "employee_info": {
