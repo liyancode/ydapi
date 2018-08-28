@@ -47,6 +47,23 @@ module YDAPI
           end
         end
 
+        def Users.func_update_password(user_name,new_password)
+          begin
+            exist_user=Users[user_name: user_name]
+            new_user=exist_user.update(
+                password: new_password
+            )
+            if new_user
+              new_user
+            else
+              exist_user
+            end
+          rescue Exception => e
+            @@logger.error("#{self}.func_update_password(#{user_id},***) Exception:#{e}")
+            nil
+          end
+        end
+
         def Users.func_get(user_name)
           begin
             Users[user_name: user_name]

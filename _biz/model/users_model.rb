@@ -52,6 +52,11 @@ module YDAPI
         @@users.func_update(user)
       end
 
+      def UsersModel.update_user_password(user_name,new_password)
+        @@logger.info("#{self}.update_user_password, user_name=#{user_name}")
+        @@users.func_update_password(user_name,new_password)
+      end
+
       def UsersModel.update_user_employee_info(user_employee_info)
         @@logger.info("#{self}.update_user_employee_info, user_employee_info=#{user_employee_info}")
         @@users_employee_info.func_update(user_employee_info)
