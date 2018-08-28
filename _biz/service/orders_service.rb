@@ -255,6 +255,26 @@ module YDAPI
         end
       end
 
+      get '/contracts/contract/by_id/:id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            id=params[:id]
+            result=@@orders_model.get_contract_by_id(id)
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.values.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       get '/contracts/by_sign_user/:sign_user_name' do
         process_request(request, 'users_get') do |req, username|
           begin
