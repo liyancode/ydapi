@@ -46,6 +46,12 @@ module YDAPI
         @@ask_prices.func_get(ask_price_id)
       end
 
+      def OrdersModel.get_ask_price_by_id(id)
+        @@logger.info("#{self}.get_ask_price_by_id(#{id})")
+        @@ask_prices.func_get_by_id(id)
+      end
+      
+
       def OrdersModel.get_ask_prices_by_user_name(user_name)
         @@logger.info("#{self}.get_ask_prices_by_user_name(#{user_name})")
         ask_prices = @@ask_prices.func_get_all_by_user_name(user_name)
@@ -54,7 +60,8 @@ module YDAPI
           ask_prices.each{|row|
             ask_prices_array<<row.values
           }
-          {:ask_prices => ask_prices_array}
+          ask_prices_array
+          # {:ask_prices => ask_prices_array}
         else
           nil
         end
@@ -101,7 +108,8 @@ module YDAPI
           contracts.each{|row|
             contracts_array<<row.values
           }
-          {:contracts => contracts_array}
+          contracts_array
+          # {:contracts => contracts_array}
         else
           nil
         end

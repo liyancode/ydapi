@@ -62,6 +62,15 @@ module YDAPI
           end
         end
 
+        def AskPrices.func_get_by_id(id)
+          begin
+            AskPrices[id: id]
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_by_id(#{id}) Exception:#{e}")
+            nil
+          end
+        end
+
         def AskPrices.func_get_all_by_user_name(user_name)
           begin
             AskPrices.dataset.where(added_by_user_name:user_name).where(status:1).all
