@@ -110,6 +110,26 @@ module YDAPI
         end
       end
 
+      get '/ask_prices/ask_price/by_id/:id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result=@@orders_model.get_ask_price_by_id(params[:id])
+            if result
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.values.to_json
+              # {:ask_price=>result.values}.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       get '/ask_prices/by_user_name' do
         process_request(request, 'users_get') do |req, username|
           begin
