@@ -369,7 +369,7 @@ module YDAPI
             order=@@orders_model.delete_order_by_order_id(params[:order_id])
             if order
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
-              status 200
+              status 201
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -539,6 +539,7 @@ module YDAPI
             contract.start_date=contract_hash["start_date"]
             contract.end_date=contract_hash["end_date"]
             contract.total_value=contract_hash["total_value"]
+            contract.total_value_currency=contract_hash["total_value_currency"]
             contract.description=contract_hash["description"]
             contract.contract_status=contract_hash["contract_status"]
             contract.comment=contract_hash["comment"]
@@ -566,8 +567,10 @@ module YDAPI
             order.order_type=order_hash["order_type"]
             order.end_date=order_hash["end_date"]
             order.total_value=order_hash["total_value"]
+            order.total_value_currency=order["total_value_currency"]
             order.pay_type=order_hash["pay_type"]
             order.paid_value=order_hash["paid_value"]
+            order.paid_value_currency=order_hash["paid_value_currency"]
             order.order_status=order_hash["order_status"]
             order.order_status_update_by=order_hash["order_status_update_by"]
             order.description=order_hash["description"]

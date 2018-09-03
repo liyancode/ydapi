@@ -83,6 +83,15 @@ module YDAPI
             nil
           end
         end
+
+        def UsersEmployeeInfo.func_get_all_by_user_ids_arr(user_ids_arr)
+          begin
+            UsersEmployeeInfo.dataset.where([[:user_id,user_ids_arr]]).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all Exception:#{e}")
+            nil
+          end
+        end
       end
     end
   end

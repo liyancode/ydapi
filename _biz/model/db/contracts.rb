@@ -14,6 +14,7 @@ module YDAPI
               c.start_date=contract.start_date
               c.end_date=contract.end_date
               c.total_value=contract.total_value
+              c.total_value_currency=contract.total_value_currency 
               c.description=contract.description
               c.comment=contract.comment
             end

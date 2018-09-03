@@ -94,6 +94,38 @@ module YDAPI
         end
       end
 
+      def UsersModel.get_all_users_by_user_names_arr(user_names_arr)
+        @@logger.info("#{self}.get_all_users_by_user_names_arr")
+        begin
+          users=@@users.func_get_all_by_user_names_arr(user_names_arr)
+          user_ids_arr=[]
+          users.each{|u|
+            user_ids_arr<<u[:user_id]
+          }
+          users_employee_info=@@users_employee_info.func_get_all_by_user_ids_arr(user_ids_arr)
+          
+          result={}
+          for user in users
+            user[:password]='***'
+            tmp_uei=nil
+            for uei in users_employee_info
+              if user[:user_id]==uei[:user_id]
+                result[user[:user_name]]={:user=>user.values,:employee_info=>uei.values}
+                tmp_uei=uei
+                break
+              end
+            end
+            if tmp_uei
+              users_employee_info.delete(tmp_uei)
+            end
+          end
+          result
+        rescue Exception => e
+          @@logger.error("#{self}.get_all_users_by_user_names_arr Exception:#{e}")
+          nil
+        end
+      end
+
       def UsersModel.get_user_and_employee_info_by_user_name(user_name)
         @@logger.info("#{self}.get_user_and_employee_info_by_user_name(#{user_name})")
         user = @@users.func_get(user_name)

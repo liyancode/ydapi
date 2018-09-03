@@ -80,7 +80,7 @@ module YDAPI
           begin
             Customers.dataset.where([[:customer_id,customer_id_arr]]).where(status:1).all
           rescue Exception => e
-            @@logger.error("#{self}.func_get_by_id_arr(#{added_by_user_name}) Exception:#{e}")
+            @@logger.error("#{self}.func_get_by_id_arr(#{customer_id_arr}) Exception:#{e}")
             nil
           end
         end
@@ -89,7 +89,7 @@ module YDAPI
           begin
             Customers.dataset.all
           rescue Exception => e
-            @@logger.error("#{self}.func_get_by_added_by_user_name(#{added_by_user_name}) Exception:#{e}")
+            @@logger.error("#{self}.func_get_all() Exception:#{e}")
             nil
           end
         end

@@ -82,6 +82,15 @@ module YDAPI
           end
         end
 
+        def Users.func_get_all_by_user_names_arr(user_names_arr)
+          begin
+            Users.dataset.where([[:user_name,user_names_arr]]).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_user_names_arr Exception:#{e}")
+            nil
+          end
+        end
+
         def Users.func_get_max_user_id
           begin
             Users.last.user_id

@@ -10,6 +10,7 @@ module YDAPI
       attr_accessor :start_date
       attr_accessor :end_date
       attr_accessor :total_value
+      attr_accessor :total_value_currency
       attr_accessor :description
       attr_accessor :contract_status #合同当前是否生效中1/0
       attr_accessor :comment
