@@ -11,8 +11,10 @@ module YDAPI
       attr_accessor :start_date
       attr_accessor :end_date
       attr_accessor :total_value
+      attr_accessor :total_value_currency
       attr_accessor :pay_type
       attr_accessor :paid_value
+      attr_accessor :paid_value_currency
       attr_accessor :order_status
       attr_accessor :order_status_update_by
       attr_accessor :is_finished

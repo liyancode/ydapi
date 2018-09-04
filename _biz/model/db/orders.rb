@@ -15,8 +15,10 @@ module YDAPI
               c.start_date=order.start_date
               c.end_date=order.end_date
               c.total_value=order.total_value
+              c.total_value_currency=order.total_value_currency
               c.pay_type=order.pay_type
               c.paid_value=order.paid_value
+              c.paid_value_currency=order.paid_value_currency
               c.order_status=order.order_status
               c.order_status_update_by=order.order_status_update_by
               c.description=order.description
@@ -49,8 +51,10 @@ module YDAPI
                 start_date:order.start_date,
                 end_date:order.end_date,
                 total_value:order.total_value,
+                total_value_currency:order.total_value_currency,
                 pay_type:order.pay_type,
                 paid_value:order.paid_value,
+                paid_value_currency:order.paid_value_currency,
                 order_status:order.order_status,
                 order_status_update_by:order.order_status_update_by,
                 is_finished:order.is_finished,
