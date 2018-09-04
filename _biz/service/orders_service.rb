@@ -582,6 +582,7 @@ module YDAPI
             nil
           end
         rescue Exception => e
+          p e
           nil
         end
       end
