@@ -567,7 +567,7 @@ module YDAPI
             order.order_type=order_hash["order_type"]
             order.end_date=order_hash["end_date"]
             order.total_value=order_hash["total_value"]
-            order.total_value_currency=order["total_value_currency"]
+            order.total_value_currency=order_hash["total_value_currency"]
             order.pay_type=order_hash["pay_type"]
             order.paid_value=order_hash["paid_value"]
             order.paid_value_currency=order_hash["paid_value_currency"]
