@@ -112,11 +112,11 @@ module YDAPI
       get '/' do
         process_request(request, 'users_get') do |req, username|
           begin
-            inventorys=@@inventories_model.get_inventorys_by_user_name('admin')
-            if inventorys
+            inventories=@@inventories_model.get_inventories_by_user_name('admin')
+            if inventories
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
-              inventorys.to_json
+              inventories.to_json
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -128,10 +128,49 @@ module YDAPI
         end
       end
 
-      get '/inventory_types/' do
+      get '/inventory_type_id/:inventory_type_id' do
         process_request(request, 'users_get') do |req, username|
           begin
-            inventory_types=@@inventories_model.get_all_inventory_types
+            inventories=@@inventories_model.get_inventories_by_type_id(params[:inventory_type_id])
+            if inventories
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              inventories.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/type_parent/:type_parent' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            inventories=@@inventories_model.get_inventories_by_type_parent(params[:type_parent])
+            if inventories
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              inventories.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      # all sub types of a type_parent --原料raw_material、半成品semifinished_product、成品product
+      get '/inventory_types/type_parent/:type_parent' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            inventory_types=@@inventories_model.get_inventory_types_by_type_parent(params[:type_parent])
             if inventory_types
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
@@ -146,12 +185,12 @@ module YDAPI
           end
         end
       end
-      
+
       post '/inventory/upload_img/:inventory_id'do
         
         process_request(request, 'users_get') do |req, username|
           begin
-            to_dest_folder="#{CONF['img_dir_inventory_detail']}/inventorys_img/#{params[:inventory_id]}"
+            to_dest_folder="#{CONF['img_dir_inventory_detail']}/inventories_img/#{params[:inventory_id]}"
             tempfile = params['file'][:tempfile]
             filename = params['file'][:filename]
             type=filename.split('.')[-1]
