@@ -80,6 +80,24 @@ module YDAPI
           end
         end
 
+        def Inventories.func_get_all_by_type_id(inventory_type_id)
+          begin
+            Inventories.dataset.where(inventory_type_id:inventory_type_id).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_type_id(#{user_name}) Exception:#{e}")
+            nil
+          end
+        end
+
+        def Inventories.func_get_all_by_type_id_arr(inventory_type_id_arr)
+          begin
+            Inventories.dataset.where([[:inventory_type_id,inventory_type_id_arr]]).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_type_id_arr(#{user_name}) Exception:#{e}")
+            nil
+          end
+        end
+
         def Inventories.func_get_max_inventory_id
           begin
             Inventories.last.inventory_id

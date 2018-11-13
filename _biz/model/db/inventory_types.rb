@@ -65,9 +65,9 @@ module YDAPI
           end
         end
 
-        def InventoryTypes.func_get_all_by_user_name(user_name)
+        def InventoryTypes.func_get_all_by_inventory_type_parent(inventory_type_parent)
           begin
-            InventoryTypes.dataset.where(added_by_user_name:user_name).where(status:1).all
+            InventoryTypes.dataset.where(inventory_type_parent:inventory_type_parent).where(status:1).all
           rescue Exception => e
             @@logger.error("#{self}.func_get_all_by_user_name(#{user_name}) Exception:#{e}")
             nil
