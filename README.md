@@ -18,3 +18,6 @@ https://stackoverflow.com/questions/3146274/is-it-ok-to-use-dyld-library-path-on
 to fix:  
 http://visheshsinghal.com/post/142/Error-while-setting-up-postgres-with-rails  
 `$sudo install_name_tool -change libpq.5.dylib /Library/PostgreSQL/9.6/lib/libpq.5.dylib /Library/Ruby/Gems/2.3.0/gems/pg-1.0.0/lib/pg_ext.bundle` 
+
+=== nginx 
+https://stackoverflow.com/questions/26589671/nginx-slow-on-every-second-request
