@@ -27,6 +27,7 @@ module YDAPI
             @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
             inventory = inventory_hash_to_inventory(body_hash)
             inventory.added_by_user_name = username
+            inventory.updated_by_user_name = username
             if inventory
               new_inventory = @@inventories_model.add_new_inventory(inventory)
               if new_inventory
@@ -49,6 +50,7 @@ module YDAPI
       delete '/inventory/:inventory_id' do
         process_request(request, 'users_get') do |req, username|
           begin
+          	@@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} user=#{username}")
             inventory=@@inventories_model.delete_inventory_by_inventory_id(params[:inventory_id])
             if inventory
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
@@ -71,6 +73,7 @@ module YDAPI
             @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
             inventory = inventory_hash_to_inventory(body_hash)
             inventory.added_by_user_name = username
+            inventory.updated_by_user_name = username
             if inventory
               new_inventory = @@inventories_model.update_inventory(inventory)
               if new_inventory
