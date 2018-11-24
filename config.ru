@@ -8,5 +8,6 @@ run Rack::URLMap.new({
                          '/api/products'=>YDAPI::BizService::ProductsService,
                          '/api/orders'=>YDAPI::BizService::OrdersService,
                          '/api/notices'=>YDAPI::BizService::NoticesService,
-                         '/api/inventories'=>YDAPI::BizService::InventoriesService
+                         '/api/inventories'=>YDAPI::BizService::InventoriesService,
+                         '/api/fin'=>YDAPI::BizService::FinService
                      })
