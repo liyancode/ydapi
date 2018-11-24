@@ -54,7 +54,7 @@ module YDAPI
             inventory=@@inventories_model.delete_inventory_by_inventory_id(params[:inventory_id])
             if inventory
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
-              status 200
+              status 201
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404

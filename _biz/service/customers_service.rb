@@ -173,6 +173,28 @@ module YDAPI
         end
       end
 
+      # get all customers(admin)
+      get '/all/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            # here use the authed username not the path param
+            customers = @@customers_model.get_all_customers(username)
+            if customers
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              # sleep(1)
+              content_type :json
+              customers.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       # add one customer_contact
       post '/customer_contact' do
         process_request(request, 'users_get') do |req, username|
