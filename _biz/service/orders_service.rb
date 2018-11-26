@@ -7,6 +7,8 @@ module YDAPI
       @@orders_model=YDAPI::BizModel::OrdersModel
       @@customers_model = YDAPI::BizModel::CustomersModel
 
+      @@fin_approvals_model = YDAPI::BizModel::FinApprovalsModel
+
       # {
       #     "id": 1,
       #     "ask_price_id": "470001",
@@ -31,6 +33,17 @@ module YDAPI
             if ask_price
               new_ask_price = @@orders_model.add_new_ask_price(ask_price)
               if new_ask_price
+                begin
+                  fin_approval = YDAPI::BizEntity::FinApproval.new
+                  fin_approval.ref_id = new_ask_price[:ask_price_id]
+                  fin_approval.type = "ask_price"
+                  fin_approval.approval_result = "waiting"
+                  fin_approval.added_by_user_name = username
+                  fin_approval.updated_by_user_name = username
+                  new_fin_approval = @@fin_approvals_model.add_new_fin_approval(fin_approval)
+                rescue Exception=>e
+
+                end
                 status 201
                 content_type :json
                 {ask_price: new_ask_price.values}.to_json
@@ -578,6 +591,29 @@ module YDAPI
             order.comment=order_hash["comment"]
             order.status=order_hash["status"]
             order
+          else
+            nil
+          end
+        rescue Exception => e
+          p e
+          nil
+        end
+      end
+
+      def fin_approval_hash_to_fin_approval(fin_approval_hash)
+        begin
+          if fin_approval_hash && fin_approval_hash.class == Hash && fin_approval_hash.keys.size > 0
+            fin_approval = YDAPI::BizEntity::FinApproval.new
+            fin_approval.id = fin_approval_hash["id"]
+            fin_approval.fin_approval_id = fin_approval_hash["fin_approval_id"]
+            fin_approval.ref_id = fin_approval_hash["ref_id"]
+            fin_approval.type = fin_approval_hash["type"]
+            fin_approval.approval_result = fin_approval_hash["approval_result"]
+            fin_approval.added_by_user_name = fin_approval_hash["added_by_user_name"]
+            fin_approval.updated_by_user_name = fin_approval_hash["updated_by_user_name"]
+            fin_approval.comment = fin_approval_hash["comment"]
+            fin_approval.status = fin_approval_hash["status"]
+            fin_approval
           else
             nil
           end

@@ -53,6 +53,24 @@ module YDAPI
           end
         end
 
+        def AskPrices.func_update_approve_status(ask_price_id,new_status,by_user_name)
+          begin
+            exist_ap=AskPrices[ask_price_id: ask_price_id]
+            new_ap=exist_ap.update(
+                approve_status:new_status,
+                approve_by_user_name:by_user_name
+            )
+            if new_ap
+              new_ap
+            else
+              exist_ap
+            end
+          rescue Exception => e
+            @@logger.error("#{self}.func_update_approve_status(#{ask_price_id},#{new_status},#{by_user_name}) Exception:#{e}")
+            nil
+          end
+        end
+
         def AskPrices.func_get(ask_price_id)
           begin
             AskPrices[ask_price_id: ask_price_id]

@@ -41,6 +41,11 @@ module YDAPI
         @@ask_prices.func_update(ask_price)
       end
 
+      def OrdersModel.update_ask_price_approve_status(ask_price_id,new_status,by_name)
+        @@logger.info("#{self}.update_ask_price, ask_price_id=#{ask_price_id},by=#{by_name}")
+        @@ask_prices.func_update_approve_status(ask_price_id,new_status,by_name)
+      end
+
       def OrdersModel.get_ask_price_by_ask_price_id(ask_price_id)
         @@logger.info("#{self}.get_ask_price_by_ask_price_id(#{ask_price_id})")
         @@ask_prices.func_get(ask_price_id)
