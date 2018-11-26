@@ -6,6 +6,7 @@ module YDAPI
       @@helper = YDAPI::Helpers::Helper
       @@user_model = YDAPI::BizModel::UsersModel
       @@customers_model = YDAPI::BizModel::CustomersModel
+      @@fin_approvals_model = YDAPI::BizModel::FinApprovalsModel
 
       # user_names: name1,name2,name3
       get '/users/:user_names' do
@@ -74,6 +75,27 @@ module YDAPI
               halt 400
             end
           rescue Exception=>e
+            @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      # 
+      get '/fin_approvals/count/:result' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            fin_approvals=@@fin_approvals_model.get_fin_approvals_by_result(params[:result])
+            if fin_approvals
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              # fin_approvals.to_json
+              {:count=>fin_approvals[:fin_approvals].size}.to_json
+            else
+              @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
             @@logger.error("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
             halt 500
           end

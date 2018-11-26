@@ -97,6 +97,15 @@ module YDAPI
           end
         end
 
+        def FinApprovals.func_get_all_by_approval_result(approval_result)
+          begin
+            FinApprovals.dataset.where(approval_result:approval_result).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_approval_result(#{approval_result}) Exception:#{e}")
+            nil
+          end
+        end
+
         def FinApprovals.func_get_all_by_ref_id_arr(ref_id_arr)
           begin
             FinApprovals.dataset.where([[:ref_id,ref_id_arr]]).where(status:1).all

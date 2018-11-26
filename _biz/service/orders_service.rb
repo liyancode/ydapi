@@ -66,7 +66,7 @@ module YDAPI
             ask_price=@@orders_model.delete_ask_price_by_ask_price_id(params[:ask_price_id])
             if ask_price
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
-              status 200
+              status 201
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -111,7 +111,8 @@ module YDAPI
             if result
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
-              {:ask_price=>result.values}.to_json
+              # {:ask_price=>result.values}.to_json
+              result.values.to_json
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -212,7 +213,7 @@ module YDAPI
             contract=@@orders_model.delete_contract_by_contract_id(params[:contract_id])
             if contract
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
-              status 200
+              status 201
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -236,7 +237,8 @@ module YDAPI
               if new_contract
                 status 201
                 content_type :json
-                {contract: new_contract.values}.to_json
+                # {contract: new_contract.values}.to_json
+                new_contract.values.to_json
               else
                 halt 409
               end
@@ -257,7 +259,8 @@ module YDAPI
             if result
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
-              {:contract=>result.values}.to_json
+              # {:contract=>result.values}.to_json
+              result.values.to_json
             else
               @@logger.info("#{self} #{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -357,6 +360,7 @@ module YDAPI
             order=order_hash_to_order(body_hash)
             order.added_by_user_name=username
             order.order_status_update_by=username
+            order.sign_by_user_name=@@orders_model.get_contract_by_contract_id(order.contract_id)[:sign_by_user_name]
             if order
               new_order = @@orders_model.add_new_order(order)
               if new_order

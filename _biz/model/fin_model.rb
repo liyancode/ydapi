@@ -77,6 +77,20 @@ module YDAPI
         end
       end
 
+      def FinApprovalsModel.get_fin_approvals_by_result(result)
+        @@logger.info("#{self}.get_fin_approvals_by_result(#{result})")
+        fin_approvals = @@fin_approvals.func_get_all_by_approval_result(result)
+        if fin_approvals
+          fin_approvals_array = []
+          fin_approvals.each {|row|
+            fin_approvals_array << row.values
+          }
+          {:fin_approvals => fin_approvals_array}
+        else
+          nil
+        end
+      end
+
       def FinApprovalsModel.get_fin_approval_by_fin_approval_id(fin_approval_id)
         @@logger.info("#{self}.get_fin_approval_by_fin_approval_id(#{fin_approval_id})")
         fin_approval = @@fin_approvals.func_get(fin_approval_id)

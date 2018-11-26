@@ -78,7 +78,7 @@ module YDAPI
               if new_fin_approval
                 begin
                   if new_fin_approval.type=='ask_price'
-                    p @@orders_model.update_ask_price_approve_status(new_fin_approval.ref_id,new_fin_approval.approval_result,username)
+                    @@orders_model.update_ask_price_approve_status(new_fin_approval.ref_id,new_fin_approval.approval_result,username)
                   end
                 rescue Exception=>e
                   p e
