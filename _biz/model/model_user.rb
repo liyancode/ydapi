@@ -165,6 +165,26 @@ module YDAPI
             'add_user_private_info'
         )
       end
+
+      def Model_User.delete_user_private_info_by_user_name(user_name)
+        @@logger.info("#{self}.delete_user_private_info_by_user_name(#{user_name})")
+        @@dao_user_private_info.func_delete(user_name)
+      end
+
+      def Model_User.update_user_private_info(user_private_info)
+        @@logger.info("#{self}.update_user_private_info, user_name=#{user_private_info.user_name}")
+        @@dao_user_private_info.func_update(user_private_info)
+      end
+
+      def Model_User.get_user_private_info_by_user_name(user_name)
+        @@logger.info("#{self}.get_user_private_info_by_user_name(#{user_name})")
+        @@dao_user_private_info.func_get(user_name)
+      end
+
+      def Model_User.get_all_user_private_infos
+        @@logger.info("#{self}.get_all_user_private_infos")
+        @@dao_user_private_info.func_get_all
+      end
     end
   end
 end
