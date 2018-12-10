@@ -14,7 +14,7 @@ module YDAPI
               obj.scope = user_authority.scope
             end
           rescue Exception => e
-            @@logger.error("#{self}.func_add(#{user_authority.user_name}) Exception:#{e}")
+            @@logger.error("#{self}.func_add(#{user_authority.authority}) Exception:#{e}")
             nil
           end
         end
