@@ -5,6 +5,7 @@ require 'sequel'
 require 'require_all'
 require 'fileutils'
 require 'bcrypt'
+require 'digest/md5'
 
 require './_conf/conf.rb'
 require './_helpers/helper.rb'
