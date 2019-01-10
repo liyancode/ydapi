@@ -4,6 +4,7 @@ module YDAPI
       use YDAPI::Helpers::JwtAuth
       @@logger = BIZ_SERVICE_LOGGER
 
+      @@helper=YDAPI::Helpers::Helper
       @@model_user = YDAPI::BizModel::Model_User
       @@bcrypt_util = YDAPI::Helpers::BcryptUtil
 
@@ -28,6 +29,52 @@ module YDAPI
         end
       end
 
+      get '/full_info/:user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            user_account = @@model_user.get_user_account_by_user_name(params[:user_name])
+            if user_account
+              user_employee_info=@@model_user.get_user_employee_info_by_user_name(params[:user_name])
+              user_department=@@model_user.get_user_department_by_department_id(user_employee_info[:department_id])
+              user_private_info=@@model_user.get_user_private_info_by_user_name(params[:user_name])
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              user_account[:password] = "***"
+              {
+                  :user_account=>user_account.values,
+                  :user_employee_info=>user_employee_info.values,
+                  :user_department=>user_department.values,
+                  :user_private_info=>user_private_info.values
+              }.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/user_account/check_user_name/un/:user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            item = @@model_user.get_user_account_by_user_name(params[:user_name])
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+            if item
+              content_type :json
+              {:user_name=>params[:user_name],:is_available=>false}.to_json
+            else
+              {:user_name=>params[:user_name],:is_available=>true}.to_json
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       post '/user_account' do
         process_request(request, 'users_get') do |req, username|
           begin
@@ -44,6 +91,97 @@ module YDAPI
                 content_type :json
                 new_user_account[:password] = "***"
                 {user_account: new_user_account.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      post '/user_account_employee_private_info' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            user_account_hash=body_hash["user_account"]
+            user_employee_info_hash=body_hash["user_employee_info"]
+            user_private_info_hash=body_hash["user_private_info"]
+
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{user_account_hash["user_name"]}")
+            user_account = meta_hash_to_user_account(user_account_hash)
+            user_account.created_by = username
+            user_account.last_update_by = username
+            user_account.password = @@bcrypt_util.bcrypt_plain_password(user_account.password)
+            if user_account
+              new_user_account = @@model_user.add_user_account(user_account)
+              if new_user_account
+                user_employee_info = meta_hash_to_user_employee_info(user_employee_info_hash)
+                user_employee_info.created_by = username
+                user_employee_info.last_update_by = username
+                new_user_employee_info=@@model_user.add_user_employee_info(user_employee_info)
+
+                user_private_info = meta_hash_to_user_private_info(user_private_info_hash)
+                user_private_info.created_by = username
+                user_private_info.last_update_by = username
+                new_user_private_info=@@model_user.add_user_private_info(user_private_info)
+
+                status 201
+                content_type :json
+                new_user_account[:password] = "***"
+                {
+                    user_account: new_user_account.values,
+                    user_employee_info:new_user_employee_info.values,
+                    user_private_info:new_user_private_info.values
+                }.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/user_account_employee_private_info' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            user_account_hash=body_hash["user_account"]
+            user_employee_info_hash=body_hash["user_employee_info"]
+            user_private_info_hash=body_hash["user_private_info"]
+
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{user_account_hash["user_name"]}")
+            user_account = meta_hash_to_user_account(user_account_hash)
+            user_account.last_update_by = username
+            user_account.password = @@bcrypt_util.bcrypt_plain_password(user_account.password)
+            if user_account
+              new_user_account = @@model_user.update_user_account(user_account)
+              if new_user_account
+                user_employee_info = meta_hash_to_user_employee_info(user_employee_info_hash)
+                user_employee_info.last_update_by = username
+                new_user_employee_info=@@model_user.update_user_employee_info(user_employee_info)
+
+                user_private_info = meta_hash_to_user_private_info(user_private_info_hash)
+                user_private_info.last_update_by = username
+                new_user_private_info=@@model_user.update_user_private_info(user_private_info)
+
+                status 201
+                content_type :json
+                new_user_account[:password] = "***"
+                {
+                    user_account: new_user_account.values,
+                    user_employee_info:new_user_employee_info.values,
+                    user_private_info:new_user_private_info.values
+                }.to_json
               else
                 halt 409
               end
@@ -237,6 +375,25 @@ module YDAPI
               @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
               item.values.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/user_department/all/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_user.get_all_user_departments
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
             else
               @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
               halt 404
@@ -443,7 +600,7 @@ module YDAPI
               if new_item
                 status 201
                 content_type :json
-                {add_user_private_info: new_item.values}.to_json
+                {user_private_info: new_item.values}.to_json
               else
                 halt 409
               end
@@ -469,7 +626,7 @@ module YDAPI
               if new_item
                 status 201
                 content_type :json
-                {add_user_private_info: new_item.values}.to_json
+                {user_private_info: new_item.values}.to_json
               else
                 halt 409
               end
@@ -501,6 +658,176 @@ module YDAPI
         end
       end
 
+      #===== /user_application/*
+      get '/user_application/:application_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            item = @@model_user.get_user_application_by_application_id(params[:application_id])
+            if item
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              item.values.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      post '/user_application' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            item = meta_hash_to_user_application(body_hash)
+            if item
+              item.created_by = username
+              item.user_name = username
+              item.application_id=@@helper.generate_application_id
+              item.last_update_by = username
+              item.approve_by=@@model_user.get_report_to_by_user_name(username)
+              new_item = @@model_user.add_user_application(item)
+              if new_item
+                status 201
+                content_type :json
+                {user_application: new_item.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/user_application' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash}")
+            item = meta_hash_to_user_application(body_hash)
+            if item
+              item.last_update_by = username
+              new_item = @@model_user.update_user_application(item)
+              if new_item
+                status 201
+                content_type :json
+                {user_private_info: new_item.values}.to_json
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      delete '/user_application/:application_id' do
+        process_request(request, 'users_delete') do |req, username|
+          begin
+            item = @@model_user.delete_user_application_by_application_id(params[:application_id])
+            if item
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              status 201
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/user_application/list/by_user_name/:user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_user.get_all_user_application_by_user_name(params[:user_name])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/user_application/list/by_approve_by/:user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_user.get_all_user_application_by_approve_by(params[:user_name])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      # ====== list
+      get '/list/by_department_id/:department_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_user.get_user_list_by_department_id(params[:department_id])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/list/for_admin' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_user.get_user_list_for_admin
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
       #===== hash to obj functions
 
       def meta_hash_to_user_account(meta_hash)
@@ -636,6 +963,33 @@ module YDAPI
             dest_obj.education = meta_hash["education"]
             dest_obj.discipline = meta_hash["discipline"]
             dest_obj.hobbies = meta_hash["hobbies"]
+            dest_obj
+          else
+            nil
+          end
+        rescue Exception => e
+          p e
+          nil
+        end
+      end
+
+      def meta_hash_to_user_application(meta_hash)
+        begin
+          if meta_hash && meta_hash.class == Hash && meta_hash.keys.size > 0
+            dest_obj = YDAPI::BizEntity::UserApplication.new
+            #--- common property
+            dest_obj.id = meta_hash["id"]
+            dest_obj.created_by = meta_hash["created_by"]
+            dest_obj.last_update_by = meta_hash["last_update_by"]
+            dest_obj.status = meta_hash["status"]
+            dest_obj.comment = meta_hash["comment"]
+            #--- customized property
+            dest_obj.application_id = meta_hash["application_id"]
+            dest_obj.user_name = meta_hash["user_name"]
+            dest_obj.type = meta_hash["type"]
+            dest_obj.description = meta_hash["description"]
+            dest_obj.approve_by = meta_hash["approve_by"]
+            dest_obj.approve_status = meta_hash["approve_status"]
             dest_obj
           else
             nil
