@@ -33,7 +33,7 @@ module YDAPI
           begin
             exist_item=DAO_UserAccount[user_name: user_account.user_name]
             new_item=exist_item.update(
-                password: user_account.password,
+                # password: user_account.password,
                 last_update_by: user_account.last_update_by,
                 comment: user_account.comment,
                 authorities: user_account.authorities
