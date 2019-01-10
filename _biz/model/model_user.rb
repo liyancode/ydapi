@@ -31,9 +31,9 @@ module YDAPI
         @@dao_user_account.func_update(user_account)
       end
 
-      def Model_User.update_user_account_password(user_name,new_password)
+      def Model_User.update_user_account_password(user_name, new_password)
         @@logger.info("#{self}.update_user_account_password, user=#{user_name}")
-        @@dao_user_account.func_update_password(user_name,new_password)
+        @@dao_user_account.func_update_password(user_name, new_password)
       end
 
       def Model_User.get_user_account_by_user_name(user_name)
@@ -113,7 +113,14 @@ module YDAPI
 
       def Model_User.get_all_user_departments
         @@logger.info("#{self}.get_all_user_departments")
-        @@dao_user_department.func_get_all
+        items=@@dao_user_department.func_get_all
+        if items
+          items_arr=[]
+          items.each{|row|
+            items_arr<<row.values
+          }
+          items_arr
+        end
       end
 
       # ====== user_employee_info
@@ -184,6 +191,77 @@ module YDAPI
       def Model_User.get_all_user_private_infos
         @@logger.info("#{self}.get_all_user_private_infos")
         @@dao_user_private_info.func_get_all
+      end
+
+      # ====== user_application
+      @@user_application = YDAPI::BizEntity::UserApplication
+      @@dao_user_application = YDAPI::BizModel::DBModel::DAO_UserApplication
+
+      def Model_User.add_user_application(user_application)
+        @@_common_model_func.common_add(
+            @@user_application,
+            user_application,
+            @@dao_user_application,
+            @@logger,
+            self,
+            'add_user_application'
+        )
+      end
+
+      def Model_User.delete_user_application_by_application_id(application_id)
+        @@logger.info("#{self}.delete_user_application_by_application_id(#{application_id})")
+        @@dao_user_application.func_delete(application_id)
+      end
+
+      def Model_User.update_user_application(user_application)
+        @@logger.info("#{self}.update_user_application, application_id=#{user_application.application_id}")
+        @@dao_user_application.func_update(user_application)
+      end
+
+      def Model_User.get_user_application_by_application_id(application_id)
+        @@logger.info("#{self}.get_user_application_by_application_id(#{application_id})")
+        @@dao_user_application.func_get(application_id)
+      end
+
+      def Model_User.get_all_user_application_by_user_name(user_name)
+        @@logger.info("#{self}.get_all_user_application_by_user_name(#{user_name})")
+        user_applications=@@dao_user_application.func_get_all_by_user_name(user_name)
+        if user_applications
+          user_application_array=[]
+          user_applications.each{|row|
+            user_application_array<<row.values
+          }
+          user_application_array
+        end
+      end
+
+      def Model_User.get_all_user_application_by_approve_by(approve_by)
+        @@logger.info("#{self}.get_all_user_application_by_approve_by(#{approve_by})")
+        user_applications=@@dao_user_application.func_get_all_by_approve_by(approve_by)
+        if user_applications
+          user_application_array=[]
+          user_applications.each{|row|
+            user_application_array<<row.values
+          }
+          user_application_array
+        end
+      end
+
+      #   ===list
+      @@dao_sql_user=YDAPI::BizModel::DBModel::DAO_SQL_User
+      def Model_User.get_user_list_by_department_id(department_id)
+        @@logger.info("#{self}.get_user_list_by_department_id(#{department_id})")
+        @@dao_sql_user.select_user_list_by_department_id(department_id)
+      end
+
+      def Model_User.get_report_to_by_user_name(user_name)
+        @@logger.info("#{self}.get_report_to_by_user_name(#{user_name})")
+        @@dao_sql_user.get_report_to_by_username(user_name)
+      end
+
+      def Model_User.get_user_list_for_admin
+        @@logger.info("#{self}.get_user_list_for_admin")
+        @@dao_sql_user.get_user_list_for_admin
       end
     end
   end
