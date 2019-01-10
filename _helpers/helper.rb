@@ -85,6 +85,45 @@ module YDAPI
           nil
         end
       end
+
+      def Helper.generate_application_id
+        begin
+          now=Time.now.utc.to_s
+          "AP#{now[0,4]}#{now[5,2]}#{now[8,2]}#{now[11,2]}#{now[14,2]}_#{('a'..'z').to_a.shuffle[0..3].join.upcase}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_application_id() Exception:#{e}")
+          nil
+        end
+      end
+
+      def Helper.generate_contract_id
+        begin
+          now=Time.now.utc.to_s
+          "YD_#{now[0,4]}#{now[5,2]}#{now[8,2]}_#{('a'..'z').to_a.shuffle[0..5].join.upcase}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_contract_id() Exception:#{e}")
+          nil
+        end
+      end
+
+      def Helper.generate_wh_raw_material_wh_id(name,specification)
+        begin
+          key="#{name.gsub(/\s+/, '')}#{specification.gsub(/\s+/, '')}"
+          "WH_RM#{Digest::MD5.hexdigest(key)[0,16].upcase}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_wh_raw_material_id(#{name},#{specification}) Exception:#{e}")
+          nil
+        end
+      end
+
+      def Helper.generate_wh_raw_material_wh_sub_id(wh_id,sub_key)
+        begin
+          "#{wh_id}_#{sub_key.to_s}_#{('a'..'z').to_a.shuffle[0..1].join.upcase}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_wh_raw_material_id(#{name},#{specification}) Exception:#{e}")
+          nil
+        end
+      end
     end
   end
 end
