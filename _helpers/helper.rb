@@ -109,7 +109,7 @@ module YDAPI
       def Helper.generate_wh_raw_material_wh_id(name,specification)
         begin
           key="#{name.gsub(/\s+/, '')}#{specification.gsub(/\s+/, '')}"
-          "WH_RM#{Digest::MD5.hexdigest(key)[0,16].upcase}"
+          "WH_RM#{Digest::MD5.hexdigest(key)[0,8].upcase}"
         rescue Exception=>e
           @@logger.error("#{self}.generate_wh_raw_material_id(#{name},#{specification}) Exception:#{e}")
           nil
