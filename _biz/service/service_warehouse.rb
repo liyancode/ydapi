@@ -4,7 +4,7 @@ module YDAPI
       use YDAPI::Helpers::JwtAuth
       @@logger = BIZ_SERVICE_LOGGER
 
-      @@helper=YDAPI::Helpers::Helper
+      @@helper = YDAPI::Helpers::Helper
       @@model_warehouse = YDAPI::BizModel::Model_Warehouse
 
       #===== /order_contract/*
@@ -73,14 +73,60 @@ module YDAPI
             obj = meta_hash_to_wh_raw_material(body_hash)
             obj.created_by = username
             obj.last_update_by = username
-            obj.wh_id = @@helper.generate_wh_raw_material_wh_id(obj.name,obj.specification)
+            obj.wh_id = @@helper.generate_wh_raw_material_wh_id(obj.name, obj.specification)
+            obj.wh_id_sub = @@helper.generate_wh_raw_material_wh_sub_id(obj.wh_id, obj.unit_price)
 
             if obj
-              new_obj = @@model_order.add_order_contract(obj)
+              if @@model_warehouse.is_wh_raw_materials_wh_id_sub_exist(obj.wh_id_sub)
+                halt 409
+              else
+                new_obj = @@model_warehouse.add_wh_raw_material(obj)
+                if new_obj
+                  status 201
+                  content_type :json
+                  {wh_raw_material: new_obj.values}.to_json
+                else
+                  halt 409
+                end
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/wh_raw_material' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash["b_customer_id"]}")
+            obj = meta_hash_to_wh_raw_material(body_hash)
+            obj.last_update_by = username
+
+            exist_record=@@model_warehouse.get_wh_raw_material_by_wh_id_sub(obj.wh_id_sub)
+
+            if obj&&exist_record
+              new_obj = @@model_warehouse.update_wh_raw_material(obj)
               if new_obj
-                status 201
-                content_type :json
-                {order_contract: new_obj.values}.to_json
+                update_count="count:#{exist_record[:count].to_f} to #{new_obj[:count].to_f}"
+                wh_raw_material_history=YDAPI::BizEntity::WHRawMaterialHistory.new
+                wh_raw_material_history.created_by = username
+                wh_raw_material_history.last_update_by = username
+                wh_raw_material_history.wh_id=obj.wh_id
+                wh_raw_material_history.wh_id_sub=obj.wh_id_sub
+                wh_raw_material_history.record_type="update"
+                wh_raw_material_history.update_what=update_count
+                if @@model_warehouse.add_wh_raw_material_history(wh_raw_material_history)
+                  status 201
+                  content_type :json
+                  {wh_raw_material: new_obj.values}.to_json
+                else
+                  halt 409
+                end
               else
                 halt 409
               end

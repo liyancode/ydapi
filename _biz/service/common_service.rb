@@ -5,7 +5,7 @@ module YDAPI
       @@logger = BIZ_SERVICE_LOGGER
       @@helper = YDAPI::Helpers::Helper
       @@user_model = YDAPI::BizModel::UsersModel
-      @@customers_model = YDAPI::BizModel::CustomersModel
+      @@customers_model = YDAPI::BizModel::Model_Customer
       @@fin_approvals_model = YDAPI::BizModel::FinApprovalsModel
 
       # user_names: name1,name2,name3

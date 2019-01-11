@@ -37,6 +37,11 @@ module YDAPI
         @@dao_wh_raw_material.func_get(id)
       end
 
+      def Model_Warehouse.get_wh_raw_material_by_wh_id_sub(wh_id_sub)
+        @@logger.info("#{self}.get_wh_raw_material_by_wh_id_sub, wh_id_sub=#{wh_id_sub}")
+        @@dao_wh_raw_material.func_get_by_wh_id_sub(wh_id_sub)
+      end
+
       def Model_Warehouse.get_wh_raw_material_by_wh_id(wh_id)
         @@logger.info("#{self}.get_wh_raw_material_by_wh_id, wh_id=#{wh_id}")
 
@@ -75,6 +80,11 @@ module YDAPI
           @@logger.error("#{self}.get_all_wh_raw_materials Exception:#{e}")
           nil
         end
+      end
+
+      def Model_Warehouse.is_wh_raw_materials_wh_id_sub_exist(wh_id_sub)
+        @@logger.info("#{self}.is_wh_raw_materials_wh_id_sub_exist")
+        @@dao_wh_raw_material.func_is_wh_id_sub_exist(wh_id_sub)
       end
 
       # ====== wh_raw_material_history

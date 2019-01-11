@@ -90,11 +90,46 @@ module YDAPI
           end
         end
 
+        def DAO_WHRawMaterial.func_get_by_wh_id_sub(wh_id_sub)
+          begin
+            DAO_WHRawMaterial[wh_id_sub: wh_id_sub]
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_by_wh_id_sub(#{wh_id_sub}) Exception:#{e}")
+            nil
+          end
+        end
+
         def DAO_WHRawMaterial.func_get_all
           begin
             DAO_WHRawMaterial.dataset.where(status:1).all
           rescue Exception => e
             @@logger.error("#{self}.func_get_all Exception:#{e}")
+            nil
+          end
+        end
+
+        def DAO_WHRawMaterial.func_is_wh_id_exist(wh_id)
+          begin
+            if DAO_WHRawMaterial[wh_id: wh_id]
+              true
+            else
+              false
+            end
+          rescue Exception => e
+            @@logger.error("#{self}.func_is_wh_id_exist Exception:#{e}")
+            nil
+          end
+        end
+
+        def DAO_WHRawMaterial.func_is_wh_id_sub_exist(wh_id_sub)
+          begin
+            if DAO_WHRawMaterial[wh_id_sub: wh_id_sub]
+              true
+            else
+              false
+            end
+          rescue Exception => e
+            @@logger.error("#{self}.func_is_wh_id_sub_exist Exception:#{e}")
             nil
           end
         end

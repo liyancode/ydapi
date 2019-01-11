@@ -5,7 +5,7 @@ module YDAPI
       @@logger = BIZ_SERVICE_LOGGER
 
       @@orders_model=YDAPI::BizModel::OrdersModel
-      @@customers_model = YDAPI::BizModel::CustomersModel
+      @@customers_model = YDAPI::BizModel::Model_Customer
 
       @@fin_approvals_model = YDAPI::BizModel::FinApprovalsModel
 
