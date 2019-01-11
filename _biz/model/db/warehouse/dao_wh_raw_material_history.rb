@@ -104,6 +104,15 @@ module YDAPI
           end
         end
 
+        def DAO_WHRawMaterialHistory.func_get_all_by_wh_id_sub(wh_id_sub)
+          begin
+            DAO_WHRawMaterialHistory.dataset.where(wh_id_sub: wh_id_sub).where(status: 1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_wh_id_sub(#{wh_id_sub}) Exception:#{e}")
+            nil
+          end
+        end
+
         def DAO_WHRawMaterialHistory.func_get_all_by_wh_id_and_type(wh_id, type)
           begin
             DAO_WHRawMaterialHistory.dataset.where(wh_id: wh_id).where(record_type: type).where(status: 1).all
@@ -113,9 +122,18 @@ module YDAPI
           end
         end
 
+        def DAO_WHRawMaterialHistory.func_get_all_by_record_type(record_type)
+          begin
+            DAO_WHRawMaterialHistory.dataset.where(record_type: record_type).where(status: 1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_record_type(#{record_type}) Exception:#{e}")
+            nil
+          end
+        end
+
         def DAO_WHRawMaterialHistory.func_get_all
           begin
-            DAO_WHRawMaterialHistory.dataset.where(status: 1).all
+            DAO_WHRawMaterialHistory.dataset.where(status: 1).where(status: 1).all
           rescue Exception => e
             @@logger.error("#{self}.func_get_all Exception:#{e}")
             nil

@@ -7,7 +7,7 @@ module YDAPI
       @@helper = YDAPI::Helpers::Helper
       @@model_warehouse = YDAPI::BizModel::Model_Warehouse
 
-      #===== /order_contract/*
+      #===== /wh_raw_material/*
       get '/wh_raw_material/:id' do
         process_request(request, 'users_get') do |req, username|
           begin
@@ -27,10 +27,48 @@ module YDAPI
         end
       end
 
+      get '/wh_raw_material/by_wh_id_sub/:wh_id_sub' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            item = @@model_warehouse.get_wh_raw_material_by_wh_id_sub(params[:wh_id_sub])
+            if item
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              item.values.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       get '/wh_raw_material/list/by_wh_id/:wh_id' do
         process_request(request, 'users_get') do |req, username|
           begin
             items = @@model_warehouse.get_wh_raw_material_by_wh_id(params[:wh_id])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_raw_material/list/by_wh_id_sub/:wh_id_sub' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_warehouse.get_wh_raw_material_by_wh_id_sub(params[:wh_id_sub])
             if items
               @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
@@ -140,6 +178,218 @@ module YDAPI
         end
       end
 
+      #===== /wh_raw_material_history/*
+      get '/wh_raw_material_history/:id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            # item = @@model_warehouse.get_wh_raw_material_history_by_id(params[:id])
+            item = @@model_warehouse.select_wh_raw_material_history_by_id(params[:id])
+            if item
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              item.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_raw_material_history/list/by_wh_id/:wh_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_warehouse.get_all_wh_raw_material_history_by_wh_id(params[:wh_id])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_raw_material_history/list/by_wh_id_sub/:wh_id_sub' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_warehouse.get_all_wh_raw_material_history_by_wh_id_sub(params[:wh_id_sub])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_raw_material_history/list/by_wh_id_and_type/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_warehouse.get_all_wh_raw_material_history_by_wh_id_type(params[:wh_id],params[:type])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_raw_material_history/list/all/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_warehouse.get_all_wh_raw_material_history()
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_raw_material_history/list/by_record_type/:record_type' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_warehouse.get_all_wh_raw_material_history_by_record_type(params[:record_type])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      post '/wh_raw_material_history' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash["b_customer_id"]}")
+            obj = meta_hash_to_wh_raw_material_history(body_hash)
+            obj.created_by = username
+            obj.last_update_by = username
+
+            if obj
+              wh_raw_material=@@model_warehouse.get_wh_raw_material_by_wh_id_sub(obj.wh_id_sub)
+              if wh_raw_material
+                old_count=wh_raw_material[:count].to_f
+                new_count=old_count
+                if obj.record_type=="inbound"
+                  new_count=old_count+obj.inbound_count.to_f
+                elsif obj.record_type=="outbound"
+                  new_count=old_count-obj.inbound_count.to_f
+                end
+                new_count=new_count<0?0:new_count
+                if @@model_warehouse.update_wh_raw_material_count(obj.wh_id_sub,new_count)
+                  new_obj = @@model_warehouse.add_wh_raw_material_history(obj)
+                  if new_obj
+                    status 201
+                    content_type :json
+                    {wh_raw_material_history: new_obj.values}.to_json
+                  else
+                    halt 409
+                  end
+                else
+                  halt 409
+                end
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/wh_raw_material_history' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            body_hash = JSON.parse(req.body.read)
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} body=#{body_hash["b_customer_id"]}")
+            obj = meta_hash_to_wh_raw_material_history(body_hash)
+            obj.last_update_by = username
+
+            if obj
+              wh_raw_material=@@model_warehouse.get_wh_raw_material_by_wh_id_sub(obj.wh_id_sub)
+              if wh_raw_material
+                old_count=wh_raw_material[:count].to_f
+                new_count=old_count
+                old_obj=@@model_warehouse.get_wh_raw_material_history_by_id(obj.id)
+                if obj.record_type==old_obj.record_type
+                  if obj.record_type=="inbound"
+                    old_obj_count=old_obj.inbound_count.to_f
+                    obj_count=obj.inbound_count.to_f
+                    new_count=old_count+obj_count-old_obj_count
+                  elsif obj.record_type=="outbound"
+                    old_obj_count=old_obj.outbound_count.to_f
+                    obj_count=obj.outbound_count.to_f
+                    new_count=old_count-obj_count+old_obj_count
+                  end
+                  new_count=new_count<0?0:new_count
+                  if @@model_warehouse.update_wh_raw_material_count(obj.wh_id_sub,new_count)
+                    new_obj = @@model_warehouse.update_wh_raw_material_history(obj)
+                    if new_obj
+                      status 201
+                      content_type :json
+                      {wh_raw_material_history: new_obj.values}.to_json
+                    else
+                      halt 409
+                    end
+                  else
+                    halt 409
+                  end
+                else
+                  halt 409
+                end
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+
+      # ====
       def meta_hash_to_wh_raw_material(meta_hash)
         begin
           if meta_hash && meta_hash.class == Hash && meta_hash.keys.size > 0

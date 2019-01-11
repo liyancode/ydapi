@@ -72,6 +72,23 @@ module YDAPI
           end
         end
 
+        def DAO_WHRawMaterial.func_update_count(wh_id_sub,new_count)
+          begin
+            exist_item=DAO_WHRawMaterial[wh_id_sub: wh_id_sub]
+            new_item=exist_item.update(
+                count: new_count
+            )
+            if new_item
+              new_item
+            else
+              exist_item
+            end
+          rescue Exception => e
+            @@logger.error("#{self}.func_update_count(#{wh_id_sub},#{new_count}) Exception:#{e}")
+            nil
+          end
+        end
+
         def DAO_WHRawMaterial.func_get(id)
           begin
             DAO_WHRawMaterial[id: id]
