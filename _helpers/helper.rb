@@ -124,6 +124,46 @@ module YDAPI
           nil
         end
       end
+
+      def Helper.generate_wh_inventory_id(type,name,specification)
+        begin
+          key="#{type.gsub(/\s+/, '')}#{name.gsub(/\s+/, '')}#{specification.gsub(/\s+/, '')}"
+          sub='YL'
+          if type=='yuanliao'
+            sub='YL'
+          elsif type=='peibu'
+            sub='PB'
+          elsif type=='chengpin'
+            sub='CP'
+          elsif type=='zhuji'
+            sub='ZJ'
+          end
+          "WH#{sub}#{Digest::MD5.hexdigest(key).upcase}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_wh_inventory_id(#{type},#{name},#{specification}) Exception:#{e}")
+          nil
+        end
+      end
+
+      def Helper.generate_wh_inventory_history_id
+        begin
+          now=Time.now.utc.to_s
+          "wh_hist#{now[2,2]}#{now[5,2]}#{now[8,2]}#{now[11,2]}#{now[14,2]}#{now[17,2]}_#{('a'..'z').to_a.shuffle[0..2].join}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_wh_inventory_history_id() Exception:#{e}")
+          nil
+        end
+      end
+
+      def Helper.generate_wh_inventory_batch_id
+        begin
+          now=Time.now.utc.to_s
+          "WH_BATCH#{now[2,2]}#{now[5,2]}#{now[8,2]}#{now[11,2]}#{now[14,2]}#{now[17,2]}_#{('a'..'z').to_a.shuffle[0..2].join.upcase}"
+        rescue Exception=>e
+          @@logger.error("#{self}.generate_wh_inventory_batch_id Exception:#{e}")
+          nil
+        end
+      end
     end
   end
 end
