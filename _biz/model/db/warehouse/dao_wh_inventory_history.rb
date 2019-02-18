@@ -14,6 +14,7 @@ module YDAPI
               obj.wh_inventory_id = wh_inventory_history.wh_inventory_id
               obj.history_type = wh_inventory_history.history_type
               obj.count_diff = wh_inventory_history.count_diff
+              obj.auxiliary_count_diff = wh_inventory_history.auxiliary_count_diff
               obj.unit_price_diff = wh_inventory_history.unit_price_diff
               obj.wh_inventory_batch_id = wh_inventory_history.wh_inventory_batch_id
               obj.other = wh_inventory_history.other
@@ -43,6 +44,7 @@ module YDAPI
 
                 history_type: wh_inventory_history.history_type,
                 count_diff: wh_inventory_history.count_diff,
+                auxiliary_count_diff: wh_inventory_history.auxiliary_count_diff,
                 unit_price_diff: wh_inventory_history.unit_price_diff,
                 wh_inventory_batch_id: wh_inventory_history.wh_inventory_batch_id,
                 other: wh_inventory_history.other

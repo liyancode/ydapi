@@ -90,6 +90,33 @@ module YDAPI
           end
         end
 
+        def DAO_WHInventory.func_update_count_in_or_out(wh_inventory_id,count_diff,auxiliary_count_diff,in_or_out)
+          begin
+            exist_item=DAO_WHInventory[wh_inventory_id: wh_inventory_id]
+            new_count=exist_item[:count]
+            new_auxiliary_count=exist_item[:auxiliary_count]
+            if in_or_out=='in'
+              new_count+=count_diff
+              new_auxiliary_count+=auxiliary_count_diff
+            elsif in_or_out=='out'
+              new_count-=count_diff
+              new_auxiliary_count-=auxiliary_count_diff
+            end
+            new_item=exist_item.update(
+                count: new_count,
+                auxiliary_count:new_auxiliary_count
+            )
+            if new_item
+              new_item
+            else
+              exist_item
+            end
+          rescue Exception => e
+            @@logger.error("#{self}.func_update_count(#{wh_inventory_id},#{new_count}) Exception:#{e}")
+            nil
+          end
+        end
+
         def DAO_WHInventory.func_get_by_wh_inventory_id(wh_inventory_id)
           begin
             DAO_WHInventory[wh_inventory_id: wh_inventory_id]

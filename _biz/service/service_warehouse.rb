@@ -435,29 +435,37 @@ module YDAPI
             obj = meta_hash_to_wh_inventory(body_hash)
             obj.created_by = username
             obj.last_update_by = username
-            obj.wh_inventory_id = @@helper.generate_wh_inventory_id(obj.wh_inventory_type, obj.name, obj.specification)
-
-            if obj
-              new_obj = @@model_warehouse.add_wh_inventory(obj)
-              if new_obj
-                hist_obj = YDAPI::BizEntity::WHInventoryHistory.new
-                hist_obj.created_by = username
-                hist_obj.last_update_by = username
-                hist_obj.history_id = @@helper.generate_wh_inventory_history_id
-                hist_obj.wh_inventory_id = obj.wh_inventory_id
-                hist_obj.history_type = "add"
-                if @@model_warehouse.add_wh_inventory_history(hist_obj)
-                  status 201
-                  content_type :json
-                  {wh_inventory: new_obj.values}.to_json
+            if obj.specification
+              tmp_spec=obj.specification
+            else
+              tmp_spec=""
+            end
+            # obj.wh_inventory_id = @@helper.generate_wh_inventory_id(obj.wh_inventory_type, obj.name, tmp_spec)
+            if obj.wh_inventory_id==""||obj.wh_inventory_id==" "
+              halt 400
+            else
+              if obj
+                new_obj = @@model_warehouse.add_wh_inventory(obj)
+                if new_obj
+                  hist_obj = YDAPI::BizEntity::WHInventoryHistory.new
+                  hist_obj.created_by = username
+                  hist_obj.last_update_by = username
+                  hist_obj.history_id = @@helper.generate_wh_inventory_history_id
+                  hist_obj.wh_inventory_id = obj.wh_inventory_id
+                  hist_obj.history_type = "add"
+                  if @@model_warehouse.add_wh_inventory_history(hist_obj)
+                    status 201
+                    content_type :json
+                    {wh_inventory: new_obj.values}.to_json
+                  else
+                    halt 409
+                  end
                 else
                   halt 409
                 end
               else
-                halt 409
+                halt 400
               end
-            else
-              halt 400
             end
           rescue Exception => e
             @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
@@ -813,6 +821,95 @@ module YDAPI
         end
       end
 
+      # ==== wh_out_record
+      post '/wh_out_record' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath}")
+            body_hash = JSON.parse(req.body.read)
+            wh_out_record_id=@@helper.generate_wh_out_record_id(@@model_warehouse.get_max_wh_out_record_id)
+            objs=meta_hash_to_wh_out_record_and_items_for_post(body_hash,username,wh_out_record_id)
+            if objs
+              wh_out_record=objs[:wh_out_record]
+              wh_out_record.wh_out_record_id=wh_out_record_id
+              items=objs[:items]
+              if @@model_warehouse.add_wh_out_record(wh_out_record,items)
+                status 201
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/wh_out_record' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath}")
+            body_hash = JSON.parse(req.body.read)
+            objs=meta_hash_to_wh_out_record_and_items_for_put(body_hash,username)
+            if objs
+              wh_out_record=objs[:wh_out_record]
+              items=objs[:items]
+              if @@model_warehouse.update_wh_out_record(wh_out_record,items)
+                status 201
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_out_record/:wh_out_record_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result = @@model_warehouse.get_wh_out_record_by_id(params[:wh_out_record_id])
+            if result
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      get '/wh_out_record/list/all/' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            result = @@model_warehouse.get_wh_out_records_all
+            if result
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              result.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       # ====
       def meta_hash_to_wh_raw_material(meta_hash)
         begin
@@ -989,6 +1086,122 @@ module YDAPI
             dest_obj.other = meta_hash["other"]
 
             dest_obj
+          else
+            nil
+          end
+        rescue Exception => e
+          p e
+          nil
+        end
+      end
+
+      def meta_hash_to_wh_out_record_and_items_for_post(meta_hash,by_username,wh_out_record_id)
+        begin
+          if meta_hash && meta_hash.class == Hash && meta_hash.keys.size > 0
+            wh_out_record_hash=meta_hash["wh_out_record"]
+            wh_out_record_obj=YDAPI::BizEntity::WHOutRecord.new
+            #--- common property
+            wh_out_record_obj.id = wh_out_record_hash["id"]
+            wh_out_record_obj.created_by = by_username
+            wh_out_record_obj.last_update_by = by_username
+            wh_out_record_obj.status = wh_out_record_hash["status"]
+            wh_out_record_obj.comment = wh_out_record_hash["comment"]
+            #--- customized property
+            wh_out_record_obj.wh_out_record_id = wh_out_record_hash["wh_out_record_id"]
+            wh_out_record_obj.wh_out_record_status = wh_out_record_hash["wh_out_record_status"]
+            wh_out_record_obj.ship_to_name = wh_out_record_hash["ship_to_name"]
+            wh_out_record_obj.ship_date = wh_out_record_hash["ship_date"]
+            wh_out_record_obj.ship_to_address = wh_out_record_hash["ship_to_address"]
+            wh_out_record_obj.ship_to_phone_number = wh_out_record_hash["ship_to_phone_number"]
+            wh_out_record_obj.ship_to_user = wh_out_record_hash["ship_to_user"]
+            wh_out_record_obj.order_id = wh_out_record_hash["order_id"]
+            wh_out_record_obj.item_count = wh_out_record_hash["item_count"]
+            wh_out_record_obj.item_total_price = wh_out_record_hash["item_total_price"]
+            wh_out_record_obj.salesman = wh_out_record_hash["salesman"]
+            wh_out_record_obj.delivery_by = wh_out_record_hash["delivery_by"]
+            wh_out_record_obj.other = wh_out_record_hash["other"]
+
+            items_arr=[]
+            hash_items=meta_hash["items"]
+            hash_items.each{|item|
+              wh_out_record_item_obj=YDAPI::BizEntity::WHOutRecordItem.new
+              #--- common property
+              wh_out_record_item_obj.id = item["id"]
+              wh_out_record_item_obj.created_by = by_username
+              wh_out_record_item_obj.last_update_by = by_username
+              wh_out_record_item_obj.status = item["status"]
+              wh_out_record_item_obj.comment = item["comment"]
+              #--- customized property
+              wh_out_record_item_obj.wh_out_record_id = wh_out_record_id
+              wh_out_record_item_obj.wh_inventory_id = item["wh_inventory_id"]
+              wh_out_record_item_obj.packing_count = item["packing_count"]
+              wh_out_record_item_obj.packing_count_unit = item["packing_count_unit"]
+              wh_out_record_item_obj.auxiliary_count = item["auxiliary_count"]
+              wh_out_record_item_obj.auxiliary_count_unit = item["auxiliary_count_unit"]
+              wh_out_record_item_obj.unit_price = item["unit_price"]
+              wh_out_record_item_obj.total_price = item["total_price"]
+              wh_out_record_item_obj.other = item["other"]
+              items_arr<<wh_out_record_item_obj
+            }
+            {:wh_out_record=>wh_out_record_obj,:items=>items_arr}
+          else
+            nil
+          end
+        rescue Exception => e
+          p e
+          nil
+        end
+      end
+
+      def meta_hash_to_wh_out_record_and_items_for_put(meta_hash,by_username)
+        begin
+          if meta_hash && meta_hash.class == Hash && meta_hash.keys.size > 0
+            wh_out_record_hash=meta_hash["wh_out_record"]
+            wh_out_record_obj=YDAPI::BizEntity::WHOutRecord.new
+            #--- common property
+            wh_out_record_obj.id = wh_out_record_hash["id"]
+            wh_out_record_obj.created_by = wh_out_record_hash["created_by"]
+            wh_out_record_obj.last_update_by = by_username
+            wh_out_record_obj.status = wh_out_record_hash["status"]
+            wh_out_record_obj.comment = wh_out_record_hash["comment"]
+            #--- customized property
+            wh_out_record_obj.wh_out_record_id = wh_out_record_hash["wh_out_record_id"]
+            wh_out_record_obj.wh_out_record_status = wh_out_record_hash["wh_out_record_status"]
+            wh_out_record_obj.ship_to_name = wh_out_record_hash["ship_to_name"]
+            wh_out_record_obj.ship_date = wh_out_record_hash["ship_date"]
+            wh_out_record_obj.ship_to_address = wh_out_record_hash["ship_to_address"]
+            wh_out_record_obj.ship_to_phone_number = wh_out_record_hash["ship_to_phone_number"]
+            wh_out_record_obj.ship_to_user = wh_out_record_hash["ship_to_user"]
+            wh_out_record_obj.order_id = wh_out_record_hash["order_id"]
+            wh_out_record_obj.item_count = wh_out_record_hash["item_count"]
+            wh_out_record_obj.item_total_price = wh_out_record_hash["item_total_price"]
+            wh_out_record_obj.salesman = wh_out_record_hash["salesman"]
+            wh_out_record_obj.delivery_by = wh_out_record_hash["delivery_by"]
+            wh_out_record_obj.other = wh_out_record_hash["other"]
+
+            items_arr=[]
+            hash_items=meta_hash["items"]
+            hash_items.each{|item|
+              wh_out_record_item_obj=YDAPI::BizEntity::WHOutRecordItem.new
+              #--- common property
+              wh_out_record_item_obj.id = item["id"]
+              wh_out_record_item_obj.created_by = item["created_by"]
+              wh_out_record_item_obj.last_update_by = by_username
+              wh_out_record_item_obj.status = item["status"]
+              wh_out_record_item_obj.comment = item["comment"]
+              #--- customized property
+              wh_out_record_item_obj.wh_out_record_id = item["wh_out_record_id"]
+              wh_out_record_item_obj.wh_inventory_id = item["wh_inventory_id"]
+              wh_out_record_item_obj.packing_count = item["packing_count"]
+              wh_out_record_item_obj.packing_count_unit = item["packing_count_unit"]
+              wh_out_record_item_obj.auxiliary_count = item["auxiliary_count"]
+              wh_out_record_item_obj.auxiliary_count_unit = item["auxiliary_count_unit"]
+              wh_out_record_item_obj.unit_price = item["unit_price"]
+              wh_out_record_item_obj.total_price = item["total_price"]
+              wh_out_record_item_obj.other = item["other"]
+              items_arr<<wh_out_record_item_obj
+            }
+            {:wh_out_record=>wh_out_record_obj,:items=>items_arr}
           else
             nil
           end

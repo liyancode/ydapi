@@ -52,6 +52,24 @@ module YDAPI
             nil
           end
         end
+
+        def DAO_SQL_Warehouse.select_max_wh_inventory_id_by_type(wh_inventory_type)
+          begin
+            result=[]
+            DB.fetch(
+                "select max(wh_inventory_id)
+                 from wh_inventory
+                 where wh_inventory_type='#{wh_inventory_type}'
+                       ").each{|row|
+              result<<row
+            }
+            result[0][:max]
+          rescue Exception => e
+            @@logger.error("#{self}.select_max_wh_inventory_id_by_type(#{wh_inventory_type}) Exception:#{e}")
+            nil
+          end
+        end
+
       end
     end
   end

@@ -11,6 +11,7 @@ module YDAPI
       attr_accessor :wh_inventory_id
       attr_accessor :history_type
       attr_accessor :count_diff
+      attr_accessor :auxiliary_count_diff
       attr_accessor :unit_price_diff
       attr_accessor :wh_inventory_batch_id
       attr_accessor :other
