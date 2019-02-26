@@ -9,6 +9,19 @@ module YDAPI
       @@bcrypt_util = YDAPI::Helpers::BcryptUtil
 
       #===== /user_account/*
+      get '/_hb_/' do
+        process_request(request, '_hb_') do |req, username|
+          begin
+            content_type :json
+            {:ts=>Time.now.to_i}.to_json
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      #===== /user_account/*
       get '/user_account/:user_name' do
         process_request(request, 'users_get') do |req, username|
           begin
