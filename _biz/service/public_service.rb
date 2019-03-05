@@ -43,7 +43,7 @@ module YDAPI
             iat: Time.now.to_i,
             iss: @@config['auth_jwt_issuer'],
             # scopes: @@helper.get_scopes_by_user_authority(authority),
-            scopes: ['users_get','users_update','users_add','users_delete'],
+            scopes: ['_hb_','users_get','users_update','users_add','users_delete'],
             user: {
                 username: username,
                 authority: authority
