@@ -8,6 +8,8 @@ module YDAPI
       attr_accessor :comment
 
       attr_accessor :wh_out_record_id
+      attr_accessor :name
+      attr_accessor :specific
       attr_accessor :wh_inventory_id
       attr_accessor :packing_count
       attr_accessor :packing_count_unit

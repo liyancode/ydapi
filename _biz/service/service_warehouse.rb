@@ -427,6 +427,26 @@ module YDAPI
         end
       end
 
+      get '/wh_inventory/list/by_wh_inventory_type_ids/:wh_inventory_type' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            id_arr=params[:ids].split(',')
+            items = @@model_warehouse.get_all_wh_inventories_by_type_ids(params[:wh_inventory_type],id_arr)
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       post '/wh_inventory' do
         process_request(request, 'users_get') do |req, username|
           begin
@@ -832,6 +852,7 @@ module YDAPI
             if objs
               wh_out_record=objs[:wh_out_record]
               wh_out_record.wh_out_record_id=wh_out_record_id
+              wh_out_record.last_update_by=username
               items=objs[:items]
               if @@model_warehouse.add_wh_out_record(wh_out_record,items)
                 status 201
@@ -856,6 +877,7 @@ module YDAPI
             objs=meta_hash_to_wh_out_record_and_items_for_put(body_hash,username)
             if objs
               wh_out_record=objs[:wh_out_record]
+              wh_out_record.last_update_by=username
               items=objs[:items]
               if @@model_warehouse.update_wh_out_record(wh_out_record,items)
                 status 201
@@ -865,6 +887,30 @@ module YDAPI
             else
               halt 400
             end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
+      put '/wh_out_record/update_status/:wh_out_record_id' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath}")
+
+            wh_out_record_id=params[:wh_out_record_id]
+            new_status=params[:new_status]
+            if wh_out_record_id!=nil&&new_status!=nil
+              if @@model_warehouse.update_wh_out_record_status(wh_out_record_id,new_status)
+                status 201
+              else
+                halt 409
+              end
+            else
+              halt 400
+            end
+
           rescue Exception => e
             @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
             halt 500
@@ -1134,6 +1180,8 @@ module YDAPI
               #--- customized property
               wh_out_record_item_obj.wh_out_record_id = wh_out_record_id
               wh_out_record_item_obj.wh_inventory_id = item["wh_inventory_id"]
+              wh_out_record_item_obj.name = item["name"]
+              wh_out_record_item_obj.specific = item["specific"]
               wh_out_record_item_obj.packing_count = item["packing_count"]
               wh_out_record_item_obj.packing_count_unit = item["packing_count_unit"]
               wh_out_record_item_obj.auxiliary_count = item["auxiliary_count"]
@@ -1192,6 +1240,8 @@ module YDAPI
               #--- customized property
               wh_out_record_item_obj.wh_out_record_id = item["wh_out_record_id"]
               wh_out_record_item_obj.wh_inventory_id = item["wh_inventory_id"]
+              wh_out_record_item_obj.name = item["name"]
+              wh_out_record_item_obj.specific = item["specific"]
               wh_out_record_item_obj.packing_count = item["packing_count"]
               wh_out_record_item_obj.packing_count_unit = item["packing_count_unit"]
               wh_out_record_item_obj.auxiliary_count = item["auxiliary_count"]

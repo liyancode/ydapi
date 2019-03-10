@@ -285,6 +285,25 @@ module YDAPI
         end
       end
 
+      def Model_Warehouse.get_all_wh_inventories_by_type_ids(wh_inventory_type,id_arr)
+        @@logger.info("#{self}.get_all_wh_inventories_by_type_ids")
+        begin
+          items = @@dao_sql_warehouse.select_all_inventories_by_type_and_ids(wh_inventory_type,id_arr)
+          arr = []
+          if items
+            items.each {|row|
+              arr << row
+            }
+            arr
+          else
+            nil
+          end
+        rescue Exception => e
+          @@logger.error("#{self}.get_all_wh_inventories_by_type_ids Exception:#{e}")
+          nil
+        end
+      end
+
       def Model_Warehouse.get_all_wh_inventories
         @@logger.info("#{self}.get_all_wh_inventories")
         begin
@@ -653,6 +672,37 @@ module YDAPI
         end
       end
 
+      def Model_Warehouse.update_wh_out_record_status(wh_out_record_id, new_status)
+        @@logger.info("#{self}.update_wh_out_record_status, wh_out_record_id=#{wh_out_record_id},new_status=#{new_status}")
+        begin
+          wh_out_record=@@dao_wh_out_record.func_update_status(wh_out_record_id,new_status)
+          if wh_out_record
+            history = YDAPI::BizEntity::WHOutRecordHistory.new
+            history.history_type = 'update_status'
+            history.created_by = wh_out_record.created_by
+            history.last_update_by = wh_out_record.last_update_by
+            history.wh_out_record_id = wh_out_record.wh_out_record_id
+            history.wh_out_record_status = wh_out_record.wh_out_record_status
+            history.ship_to_name = wh_out_record.ship_to_name
+            history.ship_to_address = wh_out_record.ship_to_address
+            history.ship_to_phone_number = wh_out_record.ship_to_phone_number
+            history.ship_to_user = wh_out_record.ship_to_user
+            history.order_id = wh_out_record.order_id
+            history.item_count = wh_out_record.item_count
+            history.item_total_price = wh_out_record.item_total_price
+            history.salesman = wh_out_record.salesman
+            history.delivery_by = wh_out_record.delivery_by
+            history.other = wh_out_record.other
+            @@dao_wh_out_record_history.func_add(history)
+            true
+          else
+            nil
+          end
+        rescue Exception => e
+          @@logger.error("#{self}.update_wh_out_record_status Exception:#{e}")
+          nil
+        end
+      end
       def Model_Warehouse.get_wh_out_record_by_id(wh_out_record_id)
         @@logger.info("#{self}.get_wh_out_record_by_id, wh_out_record_id=#{wh_out_record_id}")
         begin

@@ -70,6 +70,39 @@ module YDAPI
           end
         end
 
+        def DAO_SQL_Warehouse.select_all_inventories_by_type_and_ids(wh_inventory_type,id_arr)
+          begin
+            like_str=''
+            if id_arr.size>0
+              like_str='where id=-1'
+              id_arr.each{|id|
+                like_str=like_str+" or wh_inventory_id like '%#{id}%'"
+              }
+            end
+
+            type_str=''
+            if wh_inventory_type!='all'
+              if like_str==''
+                type_str=" where wh_inventory_type='#{wh_inventory_type}'"
+              else
+                type_str=" and wh_inventory_type='#{wh_inventory_type}'"
+              end
+            end
+            result=[]
+            sql="select *
+                 from wh_inventory
+                 #{like_str}#{type_str}"
+            @@logger.info("#{self}.select_all_inventories_by_type_and_ids(#{wh_inventory_type},#{id_arr}) sql=#{sql}")
+            DB.fetch(sql).each{|row|
+              result<<row
+            }
+            result
+          rescue Exception => e
+            @@logger.error("#{self}.select_all_inventories_by_type_and_ids(#{wh_inventory_type},#{id_arr}) Exception:#{e}")
+            nil
+          end
+        end
+
       end
     end
   end

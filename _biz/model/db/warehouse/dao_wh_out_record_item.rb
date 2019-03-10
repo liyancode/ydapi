@@ -13,6 +13,8 @@ module YDAPI
 
               obj.wh_out_record_id = wh_out_record_item.wh_out_record_id
               obj.wh_inventory_id = wh_out_record_item.wh_inventory_id
+              obj.name = wh_out_record_item.name
+              obj.specific = wh_out_record_item.specific
               obj.packing_count = wh_out_record_item.packing_count
               obj.packing_count_unit = wh_out_record_item.packing_count_unit
               obj.auxiliary_count = wh_out_record_item.auxiliary_count
