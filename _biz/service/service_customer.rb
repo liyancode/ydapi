@@ -189,7 +189,6 @@ module YDAPI
       get '/:user_name' do
         process_request(request, 'users_get') do |req, username|
           begin
-            sleep(1)
             # here use the authed username not the path param
             customers = @@customers_model.get_customers_by_user_name(username)
             if customers
