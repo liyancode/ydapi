@@ -10,10 +10,18 @@ module YDAPI
               obj.last_update_by = user_employee_info.last_update_by
               obj.comment = user_employee_info.comment
               obj.user_name = user_employee_info.user_name
+              obj.employee_number = user_employee_info.employee_number
+              obj.employee_type = user_employee_info.employee_type
               obj.title = user_employee_info.title
               obj.level = user_employee_info.level
               obj.department_id = user_employee_info.department_id
               obj.report_to = user_employee_info.report_to
+              obj.sub_tel_number = user_employee_info.sub_tel_number
+              obj.cm_group_short_number = user_employee_info.cm_group_short_number
+              obj.attendance_number = user_employee_info.attendance_number
+              obj.entrance_card_number = user_employee_info.entrance_card_number
+              obj.bank_card_number = user_employee_info.bank_card_number
+              obj.bank_card_belong_to = user_employee_info.bank_card_belong_to
               obj.onboard_date = user_employee_info.onboard_date
               obj.resignation_date = user_employee_info.resignation_date
               obj.employee_status = user_employee_info.employee_status
@@ -41,10 +49,17 @@ module YDAPI
             new_item=exist_item.update(
                 last_update_by: user_employee_info.last_update_by,
                 comment: user_employee_info.comment,
+                employee_type: user_employee_info.employee_type,
                 title: user_employee_info.title,
                 level: user_employee_info.level,
                 department_id: user_employee_info.department_id,
                 report_to: user_employee_info.report_to,
+                sub_tel_number: user_employee_info.sub_tel_number,
+                cm_group_short_number: user_employee_info.cm_group_short_number,
+                attendance_number: user_employee_info.attendance_number,
+                entrance_card_number: user_employee_info.entrance_card_number,
+                bank_card_number: user_employee_info.bank_card_number,
+                bank_card_belong_to: user_employee_info.bank_card_belong_to,
                 onboard_date: user_employee_info.onboard_date,
                 resignation_date: user_employee_info.resignation_date,
                 employee_status: user_employee_info.employee_status,
