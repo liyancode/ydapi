@@ -12,7 +12,6 @@ module YDAPI
       get '/_hb_/' do
         process_request(request, '_hb_') do |req, username|
           begin
-            p request.ip
             content_type :json
             {:ts=>Time.now.to_i}.to_json
           rescue Exception => e
