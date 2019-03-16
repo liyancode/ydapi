@@ -280,6 +280,7 @@ module YDAPI
           if last_n_hist
             result=[]
             last_n_hist.each{|row|
+              row[:ip_location_info]=JSON.parse(row[:ip_location_info])
               result<<row.values
             }
             {

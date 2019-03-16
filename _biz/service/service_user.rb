@@ -50,6 +50,7 @@ module YDAPI
               user_employee_info=@@model_user.get_user_employee_info_by_user_name(params[:user_name])
               user_department=@@model_user.get_user_department_by_department_id(user_employee_info[:department_id])
               user_private_info=@@model_user.get_user_private_info_by_user_name(params[:user_name])
+              user_login_history=@@model_user.get_user_login_history(CONF["show_login_hist_count"],params[:user_name])
               @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
               content_type :json
               user_account[:password] = "***"
@@ -57,7 +58,8 @@ module YDAPI
                   :user_account=>user_account.values,
                   :user_employee_info=>user_employee_info.values,
                   :user_department=>user_department.values,
-                  :user_private_info=>user_private_info.values
+                  :user_private_info=>user_private_info.values,
+                  :user_login_history=>user_login_history
               }.to_json
             else
               @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")

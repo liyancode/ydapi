@@ -14,11 +14,11 @@ module YDAPI
           Thread.new{
             begin
               ip=request.ip
-              if ip and ip!='127.0.0.1'
+              if ip and ip!='127.0.0.11'
                 ip_location=@@helper.get_ip_location_info(ip)
                 ip_location_info=''
                 if ip_location
-                  ip_location_info=ip_location.to_s
+                  ip_location_info=ip_location.to_json
                 end
                 user_login_history=YDAPI::BizEntity::UserLoginHistory.new
                 user_login_history.created_by=user_name
