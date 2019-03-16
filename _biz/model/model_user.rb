@@ -263,6 +263,37 @@ module YDAPI
         @@logger.info("#{self}.get_user_list_for_admin")
         @@dao_sql_user.get_user_list_for_admin
       end
+
+      # === user login history
+      @@user_login_history = YDAPI::BizEntity::UserLoginHistory
+      @@dao_user_user_login_history = YDAPI::BizModel::DBModel::DAO_UserLoginHistory
+
+      def Model_User.add_user_login_history(user_login_history)
+        @@logger.info("#{self}.add_user_login_history(#{user_login_history.user_name})")
+        @@dao_user_user_login_history.func_add(user_login_history)
+      end
+
+      def Model_User.get_user_login_history(last_n,user_name)
+        @@logger.info("#{self}.get_user_login_history(#{last_n},#{user_name})")
+        begin
+          last_n_hist=@@dao_user_user_login_history.func_get_last_n_by_user_name(last_n,user_name)
+          if last_n_hist
+            result=[]
+            last_n_hist.each{|row|
+              result<<row.values
+            }
+            {
+                :user_name=>user_name,
+                :login_history=>result
+            }
+          else
+            nil
+          end
+        rescue Exception=>e
+          @@logger.error("#{self}.get_user_login_history(#{last_n},#{user_name}) Exception:#{e}")
+          nil
+        end
+      end
     end
   end
 end
