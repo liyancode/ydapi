@@ -12,6 +12,7 @@ module YDAPI
       get '/_hb_/' do
         process_request(request, '_hb_') do |req, username|
           begin
+            p request.ip
             content_type :json
             {:ts=>Time.now.to_i}.to_json
           rescue Exception => e
@@ -45,6 +46,7 @@ module YDAPI
       get '/full_info/:user_name' do
         process_request(request, 'users_get') do |req, username|
           begin
+            p request.ip
             user_account = @@model_user.get_user_account_by_user_name(params[:user_name])
             if user_account
               user_employee_info=@@model_user.get_user_employee_info_by_user_name(params[:user_name])
