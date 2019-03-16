@@ -48,6 +48,7 @@ module YDAPI
           begin
             p request.ip
             p request.user_agent
+            p @@helper.get_ip_location_info(request.ip)
             user_account = @@model_user.get_user_account_by_user_name(params[:user_name])
             if user_account
               user_employee_info=@@model_user.get_user_employee_info_by_user_name(params[:user_name])
