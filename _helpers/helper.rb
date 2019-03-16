@@ -215,6 +215,17 @@ module YDAPI
           nil
         end
       end
+
+      def Helper.get_ip_location_info(ip_v4_address)
+        begin
+          client = HTTPClient.new
+          res=client.get("#{CONF["ipstack_api"]}/#{ip_v4_address}?access_key=#{CONF["ipstack_api_access_key"]}&format=1")
+          JSON.parse(res.content) # hash
+        rescue Exception=>e
+          @@logger.error("#{self}.get_ip_location_info(#{ip_v4_address}) Exception:#{e}")
+          nil
+        end
+      end
     end
   end
 end
