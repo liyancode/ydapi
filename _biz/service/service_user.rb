@@ -47,6 +47,7 @@ module YDAPI
         process_request(request, 'users_get') do |req, username|
           begin
             p request.ip
+            p request.user_agent
             user_account = @@model_user.get_user_account_by_user_name(params[:user_name])
             if user_account
               user_employee_info=@@model_user.get_user_employee_info_by_user_name(params[:user_name])
