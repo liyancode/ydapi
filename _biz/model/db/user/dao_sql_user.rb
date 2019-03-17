@@ -43,7 +43,7 @@ module YDAPI
           begin
             result=[]
             DB.fetch(
-                "select uei.id,uei.user_name,uei.title,uei.onboard_date,uei.employee_status,upi.full_name,upi.gender,ud.department_name
+                "select uei.id,uei.employee_number,uei.user_name,uei.title,uei.onboard_date,uei.employee_status,upi.full_name,upi.gender,ud.department_name
                  from user_employee_info as uei,user_private_info as upi,user_department as ud
                  where uei.status=1 and uei.user_name=upi.user_name and uei.department_id=ud.department_id").each{|row|
               result<<row
