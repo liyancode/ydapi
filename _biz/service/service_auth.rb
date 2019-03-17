@@ -14,7 +14,7 @@ module YDAPI
           Thread.new{
             begin
               ip=request.ip
-              if ip and ip!='127.0.0.11'
+              if ip and ip!='127.0.0.1'
                 ip_location=@@helper.get_ip_location_info(ip)
                 ip_location_info=''
                 if ip_location
