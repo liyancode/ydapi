@@ -26,9 +26,9 @@ module YDAPI
                 "select usi.report_to,ud.department_manager
                  from user_employee_info as usi,user_department as ud
                  where usi.user_name='#{username}' and usi.department_id=ud.department_id").each{|row|
-              if row[:report_to]!=''
+              if row[:report_to]!=''&&row[:report_to]!=nil
                 report_to=row[:report_to]
-              elsif row[:department_manager]!=''
+              elsif row[:department_manager]!=''&&row[:department_manager]!=nil
                 report_to=row[:department_manager]
               end
             }

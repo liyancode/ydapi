@@ -72,6 +72,15 @@ module YDAPI
           end
         end
 
+        def DAO_UserApplication.func_get_all_by_user_name_and_type(user_name,type)
+          begin
+            DAO_UserApplication.dataset.where(user_name:user_name).where(type:type).where(status:1).all
+          rescue Exception => e
+            @@logger.error("#{self}.func_get_all_by_user_name_and_type(#{user_name},#{type}) Exception:#{e}")
+            nil
+          end
+        end
+
         def DAO_UserApplication.func_get_all_by_approve_by(approve_by)
           begin
             DAO_UserApplication.dataset.where(approve_by:approve_by).where(status:1).all

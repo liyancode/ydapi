@@ -786,6 +786,25 @@ module YDAPI
         end
       end
 
+      get '/user_application/list/by_user_name_and_type/:user_name' do
+        process_request(request, 'users_get') do |req, username|
+          begin
+            items = @@model_user.get_all_user_application_by_user_name_and_type(params[:user_name],params[:type])
+            if items
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 200 OK. token user=#{username}")
+              content_type :json
+              items.to_json
+            else
+              @@logger.info("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 404 Not Found. token user=#{username}")
+              halt 404
+            end
+          rescue Exception => e
+            @@logger.error("#{req.env["REQUEST_METHOD"]} #{req.fullpath} 500 Internal Server Error, token user=#{username}, Exception:#{e}")
+            halt 500
+          end
+        end
+      end
+
       get '/user_application/list/by_approve_by/:user_name' do
         process_request(request, 'users_get') do |req, username|
           begin

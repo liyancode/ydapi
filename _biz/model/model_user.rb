@@ -235,6 +235,18 @@ module YDAPI
         end
       end
 
+      def Model_User.get_all_user_application_by_user_name_and_type(user_name,type)
+        @@logger.info("#{self}.get_all_user_application_by_user_name_and_type(#{user_name},#{type})")
+        user_applications=@@dao_user_application.func_get_all_by_user_name_and_type(user_name,type)
+        if user_applications
+          user_application_array=[]
+          user_applications.each{|row|
+            user_application_array<<row.values
+          }
+          user_application_array
+        end
+      end
+
       def Model_User.get_all_user_application_by_approve_by(approve_by)
         @@logger.info("#{self}.get_all_user_application_by_approve_by(#{approve_by})")
         user_applications=@@dao_user_application.func_get_all_by_approve_by(approve_by)
