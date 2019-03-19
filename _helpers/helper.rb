@@ -89,7 +89,7 @@ module YDAPI
       def Helper.generate_application_id
         begin
           now = Time.now.utc.to_s
-          "AP#{now[2, 4]}#{now[5, 2]}#{now[8, 2]}#{now[11, 2]}#{now[14, 2]}_#{('a'..'z').to_a.shuffle[0..1].join.upcase}"
+          "AP#{now[2, 2]}#{now[5, 2]}#{now[8, 2]}#{now[11, 2]}#{now[14, 2]}_#{('a'..'z').to_a.shuffle[0..1].join.upcase}"
         rescue Exception => e
           @@logger.error("#{self}.generate_application_id() Exception:#{e}")
           nil
